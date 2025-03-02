@@ -1,27 +1,20 @@
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TwentyFiveSlicer.Runtime
-{
+namespace TwentyFiveSlicer.Runtime {
     [RequireComponent(typeof(CanvasRenderer))]
-    public class TwentyFiveSliceImage : Image
-    {
-        private struct SliceRect
-        {
+    public class TwentyFiveSliceImage : Image {
+        private struct SliceRect {
             public Vector2 Position;
             public Vector2 Size;
             public Vector2 UVMin;
             public Vector2 UVMax;
         }
 
-        public bool DebuggingView
-        {
+        public bool DebuggingView {
             get => debuggingView;
-            set
-            {
-                if (debuggingView != value)
-                {
+            set {
+                if(debuggingView != value) {
                     debuggingView = value;
                     SetVerticesDirty();
                 }
@@ -29,21 +22,18 @@ namespace TwentyFiveSlicer.Runtime
         }
 
         [SerializeField] private bool debuggingView = false;
-        
+
         private readonly bool[] _fixedColumns = { true, false, true, false, true };
         private readonly bool[] _fixedRows = { true, false, true, false, true };
 
-        protected override void OnPopulateMesh(VertexHelper vh)
-        {
+        protected override void OnPopulateMesh(VertexHelper vh) {
             vh.Clear();
-            if (sprite == null)
-            {
+            if(sprite == null) {
                 base.OnPopulateMesh(vh);
                 return;
             }
 
-            if (!SliceDataManager.Instance.TryGetSliceData(sprite, out var sliceData))
-            {
+            if(!SliceDataManager.Instance.TryGetSliceData(sprite, out var sliceData)) {
                 base.OnPopulateMesh(vh);
                 return;
             }
@@ -72,8 +62,7 @@ namespace TwentyFiveSlicer.Runtime
             DrawSlices(vh, slices);
         }
 
-        private float[] GetXBordersPercent(TwentyFiveSliceData sliceData)
-        {
+        private float[] GetXBordersPercent(TwentyFiveSliceData sliceData) {
             return new float[]
             {
                 0f, sliceData.xBorders[0], sliceData.xBorders[1], sliceData.xBorders[2],
@@ -81,8 +70,7 @@ namespace TwentyFiveSlicer.Runtime
             };
         }
 
-        private float[] GetYBordersPercent(TwentyFiveSliceData sliceData)
-        {
+        private float[] GetYBordersPercent(TwentyFiveSliceData sliceData) {
             return new float[]
             {
                 0f, 1f - sliceData.yBorders[3], 1f - sliceData.yBorders[2],
@@ -90,8 +78,7 @@ namespace TwentyFiveSlicer.Runtime
             };
         }
 
-        private float[] GetUVBorders(float min, float max, float[] bordersPercent)
-        {
+        private float[] GetUVBorders(float min, float max, float[] bordersPercent) {
             return new float[]
             {
                 min, Mathf.Lerp(min, max, bordersPercent[1]), Mathf.Lerp(min, max, bordersPercent[2]),
@@ -99,32 +86,26 @@ namespace TwentyFiveSlicer.Runtime
             };
         }
 
-        private float[] GetOriginalSizes(float[] bordersPercent, float totalSize)
-        {
+        private float[] GetOriginalSizes(float[] bordersPercent, float totalSize) {
             return new float[]
             {
-                (bordersPercent[1] - bordersPercent[0]) * totalSize,
-                (bordersPercent[2] - bordersPercent[1]) * totalSize,
-                (bordersPercent[3] - bordersPercent[2]) * totalSize,
-                (bordersPercent[4] - bordersPercent[3]) * totalSize,
-                (bordersPercent[5] - bordersPercent[4]) * totalSize
+                (bordersPercent[1] - bordersPercent[0]) * totalSize * pixelsPerUnitMultiplier,
+                (bordersPercent[2] - bordersPercent[1]) * totalSize * pixelsPerUnitMultiplier,
+                (bordersPercent[3] - bordersPercent[2]) * totalSize * pixelsPerUnitMultiplier,
+                (bordersPercent[4] - bordersPercent[3]) * totalSize * pixelsPerUnitMultiplier,
+                (bordersPercent[5] - bordersPercent[4]) * totalSize * pixelsPerUnitMultiplier
             };
         }
 
-        private float[] GetAdjustedSizes(float totalSize, float[] originalSizes, bool[] fixedSizes)
-        {
+        private float[] GetAdjustedSizes(float totalSize, float[] originalSizes, bool[] fixedSizes) {
             float totalFixedSize = 0f;
             float stretchableSizeRatio = 0f;
 
             // Calculate total fixed size and stretchable size ratio
-            for (int i = 0; i < 5; i++)
-            {
-                if (fixedSizes[i])
-                {
+            for(int i = 0; i < 5; i++) {
+                if(fixedSizes[i]) {
                     totalFixedSize += originalSizes[i];
-                }
-                else
-                {
+                } else {
                     stretchableSizeRatio += originalSizes[i];
                 }
             }
@@ -133,19 +114,15 @@ namespace TwentyFiveSlicer.Runtime
             float[] adjustedSizes = new float[5];
 
             // If total size is less than total fixed size, scale down the fixed sizes
-            if (totalSize < totalFixedSize)
-            {
+            if(totalSize < totalFixedSize) {
                 float scaleRatio = totalSize / totalFixedSize;
-                for (int i = 0; i < 5; i++)
-                {
+                for(int i = 0; i < 5; i++) {
                     adjustedSizes[i] = fixedSizes[i] ? originalSizes[i] * scaleRatio : 0;
                 }
             }
             // Otherwise, distribute the remaining size proportionally to the stretchable sizes
-            else
-            {
-                for (int i = 0; i < 5; i++)
-                {
+            else {
+                for(int i = 0; i < 5; i++) {
                     adjustedSizes[i] = fixedSizes[i]
                         ? originalSizes[i]
                         : totalStretchableSize * (originalSizes[i] / stretchableSizeRatio);
@@ -155,28 +132,22 @@ namespace TwentyFiveSlicer.Runtime
             return adjustedSizes;
         }
 
-        private float[] GetPositions(float start, float[] sizes)
-        {
+        private float[] GetPositions(float start, float[] sizes) {
             float[] positions = new float[6];
             positions[0] = start;
-            for (int i = 1; i < 6; i++)
-            {
+            for(int i = 1; i < 6; i++) {
                 positions[i] = positions[i - 1] + sizes[i - 1];
             }
-            
+
             return positions;
         }
 
         private SliceRect[,] GetSlices(float[] xPositions, float[] yPositions, float[] uvXBorders, float[] uvYBorders,
-            float[] widths, float[] heights)
-        {
+            float[] widths, float[] heights) {
             SliceRect[,] slices = new SliceRect[5, 5];
-            for (int y = 0; y < 5; y++)
-            {
-                for (int x = 0; x < 5; x++)
-                {
-                    slices[x, y] = new SliceRect
-                    {
+            for(int y = 0; y < 5; y++) {
+                for(int x = 0; x < 5; x++) {
+                    slices[x, y] = new SliceRect {
                         Position = new Vector2(xPositions[x], yPositions[y]),
                         Size = new Vector2(widths[x], heights[y]),
                         UVMin = new Vector2(uvXBorders[x], uvYBorders[y]),
@@ -188,16 +159,12 @@ namespace TwentyFiveSlicer.Runtime
             return slices;
         }
 
-        private void DrawSlices(VertexHelper vh, SliceRect[,] slices)
-        {
-            for (int y = 0; y < 5; y++)
-            {
-                for (int x = 0; x < 5; x++)
-                {
+        private void DrawSlices(VertexHelper vh, SliceRect[,] slices) {
+            for(int y = 0; y < 5; y++) {
+                for(int x = 0; x < 5; x++) {
                     var slice = slices[x, y];
                     Color sliceColor = DebuggingView ? new Color((float)x / 4, (float)y / 4, (float)(x + y) / 8) : color;
-                    if (slice.Size.x > 0 && slice.Size.y > 0)
-                    {
+                    if(slice.Size.x > 0 && slice.Size.y > 0) {
                         AddQuad(vh, slice.Position, slice.Position + slice.Size, slice.UVMin, slice.UVMax, sliceColor);
                     }
                 }
@@ -205,8 +172,7 @@ namespace TwentyFiveSlicer.Runtime
         }
 
         private void AddQuad(VertexHelper vh, Vector2 bottomLeft, Vector2 topRight, Vector2 uvBottomLeft,
-            Vector2 uvTopRight, Color color)
-        {
+            Vector2 uvTopRight, Color color) {
             int vertexIndex = vh.currentVertCount;
             vh.AddVert(new Vector3(bottomLeft.x, bottomLeft.y), color, new Vector2(uvBottomLeft.x, uvBottomLeft.y));
             vh.AddVert(new Vector3(bottomLeft.x, topRight.y), color, new Vector2(uvBottomLeft.x, uvTopRight.y));
