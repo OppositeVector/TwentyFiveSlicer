@@ -533,10 +533,10 @@ namespace TwentyFiveSlicer.Runtime
             return new[]
             {
                 0f,
-                sliceData.verticalBorders[0],
-                sliceData.verticalBorders[1],
-                sliceData.verticalBorders[2],
-                sliceData.verticalBorders[3],
+                sliceData.xBorders[0],
+                sliceData.xBorders[1],
+                sliceData.xBorders[2],
+                sliceData.xBorders[3],
                 100f
             };
         }
@@ -546,10 +546,10 @@ namespace TwentyFiveSlicer.Runtime
             return new[]
             {
                 0f,
-                100f - sliceData.horizontalBorders[3],
-                100f - sliceData.horizontalBorders[2],
-                100f - sliceData.horizontalBorders[1],
-                100f - sliceData.horizontalBorders[0],
+                100f - sliceData.yBorders[3],
+                100f - sliceData.yBorders[2],
+                100f - sliceData.yBorders[1],
+                100f - sliceData.yBorders[0],
                 100f
             };
         }
@@ -559,10 +559,10 @@ namespace TwentyFiveSlicer.Runtime
             return new[]
             {
                 min,
-                Mathf.Lerp(min, max, bordersPercent[1] / 100f),
-                Mathf.Lerp(min, max, bordersPercent[2] / 100f),
-                Mathf.Lerp(min, max, bordersPercent[3] / 100f),
-                Mathf.Lerp(min, max, bordersPercent[4] / 100f),
+                Mathf.Lerp(min, max, bordersPercent[1]),
+                Mathf.Lerp(min, max, bordersPercent[2]),
+                Mathf.Lerp(min, max, bordersPercent[3]),
+                Mathf.Lerp(min, max, bordersPercent[4]),
                 max
             };
         }
@@ -571,11 +571,11 @@ namespace TwentyFiveSlicer.Runtime
         {
             return new[]
             {
-                (bordersPercent[1] - bordersPercent[0]) * totalSize / 100f,
-                (bordersPercent[2] - bordersPercent[1]) * totalSize / 100f,
-                (bordersPercent[3] - bordersPercent[2]) * totalSize / 100f,
-                (bordersPercent[4] - bordersPercent[3]) * totalSize / 100f,
-                (bordersPercent[5] - bordersPercent[4]) * totalSize / 100f
+                (bordersPercent[1] - bordersPercent[0]) * totalSize,
+                (bordersPercent[2] - bordersPercent[1]) * totalSize,
+                (bordersPercent[3] - bordersPercent[2]) * totalSize,
+                (bordersPercent[4] - bordersPercent[3]) * totalSize,
+                (bordersPercent[5] - bordersPercent[4]) * totalSize
             };
         }
 

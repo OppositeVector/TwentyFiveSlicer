@@ -3,8 +3,8 @@
     public enum DraggingState
     {
         None,
-        Vertical,
         Horizontal,
+        Vertical,
         Intersection
     }
 }

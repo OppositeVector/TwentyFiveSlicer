@@ -2,17 +2,18 @@ using TwentyFiveSlicer.Runtime;
 using UnityEditor;
 using UnityEngine;
 
-namespace TwentyFiveSlicer.TFSEditor.Editor
-{
-    public class TwentyFiveSliceEditor : EditorWindow
-    {
+namespace TwentyFiveSlicer.TFSEditor.Editor {
+    public class TwentyFiveSliceEditor : EditorWindow {
+
+        private static float[] _defaultBorders = { 0.2f, 0.4f, 0.6f, 0.8f };
+
         // Sprite and zoom data
         private Sprite _currentSpriteBackingField;
         private Texture2D _spriteTexture;
 
         // Borders data
-        private float[] _verticalBorders = { 20f, 40f, 60f, 80f };
-        private float[] _horizontalBorders = { 20f, 40f, 60f, 80f };
+        private float[] _xBorders = (float[])_defaultBorders.Clone();
+        private float[] _yBorders = (float[])_defaultBorders.Clone();
         private bool _bordersLoaded = false;
 
         // Scroll and zoom states
@@ -29,18 +30,14 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
         private DraggingInfo _dragInfo = new DraggingInfo();
 
         [MenuItem("Window/2D/25-Slice Editor")]
-        public static void ShowWindow()
-        {
+        public static void ShowWindow() {
             GetWindow<TwentyFiveSliceEditor>("25-Slice Editor");
         }
 
-        private Sprite CurrentSprite
-        {
+        private Sprite CurrentSprite {
             get => _currentSpriteBackingField;
-            set
-            {
-                if (_currentSpriteBackingField != value)
-                {
+            set {
+                if(_currentSpriteBackingField != value) {
                     _currentSpriteBackingField = value;
                     // Reset states when sprite changes
                     _bordersLoaded = false;
@@ -52,26 +49,23 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
             }
         }
 
-        private void OnEnable()
-        {
+        private void OnEnable() {
             this.wantsMouseMove = true;
         }
 
-        private void OnGUI()
-        {
+        private void OnGUI() {
             Rect localWindowRect = new Rect(0, 0, position.width, position.height);
             DrawMainBackground(localWindowRect);
 
             DrawToolbar();
 
-            if (CurrentSprite == null)
-            {
+            if(CurrentSprite == null) {
                 EditorGUILayout.HelpBox("Please select a Sprite to slice.", MessageType.Info);
                 return;
             }
 
             EnsureBordersLoaded();
-            if (_spriteTexture == null) return;
+            if(_spriteTexture == null) return;
 
             ApplyAutoZoomIfNeeded();
 
@@ -85,8 +79,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
         /// <summary>
         /// Draws the top toolbar with editor title and sprite selection.
         /// </summary>
-        private void DrawToolbar()
-        {
+        private void DrawToolbar() {
             GUILayout.BeginHorizontal(EditorStyles.toolbar, GUILayout.ExpandWidth(true));
             {
                 GUILayout.Label("25-Slice Editor", EditorStyles.whiteLabel);
@@ -104,15 +97,12 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
         /// <summary>
         /// Loads borders if not loaded yet.
         /// </summary>
-        private void EnsureBordersLoaded()
-        {
-            if (!_bordersLoaded)
-            {
+        private void EnsureBordersLoaded() {
+            if(!_bordersLoaded) {
                 _bordersLoaded = SliceDataManager.Instance.TryGetSliceData(CurrentSprite, out var sliceData);
-                if (_bordersLoaded)
-                {
-                    _verticalBorders = sliceData.verticalBorders;
-                    _horizontalBorders = sliceData.horizontalBorders;
+                if(_bordersLoaded) {
+                    _xBorders = sliceData.xBorders;
+                    _yBorders = sliceData.yBorders;
                 }
             }
 
@@ -122,10 +112,8 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
         /// <summary>
         /// Applies auto zoom if it was not applied yet.
         /// </summary>
-        private void ApplyAutoZoomIfNeeded()
-        {
-            if (!_autoZoomApplied && _spriteTexture != null)
-            {
+        private void ApplyAutoZoomIfNeeded() {
+            if(!_autoZoomApplied && _spriteTexture != null) {
                 ApplyAutoZoomToFitSprite();
                 _autoZoomApplied = true;
             }
@@ -135,9 +123,8 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
         /// Apply auto zoom so that the sprite fits the window perfectly at 100% (zoomFactor=1).
         /// Later, user can zoom in/out with scroll wheel.
         /// </summary>
-        private void ApplyAutoZoomToFitSprite()
-        {
-            if (_spriteTexture == null) return;
+        private void ApplyAutoZoomToFitSprite() {
+            if(_spriteTexture == null) return;
 
             float usableWidth = position.width - Margin * 2f;
             float usableHeight = position.height - Margin * 2f;
@@ -153,11 +140,9 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
         /// Handles zoom events using mouse scroll wheel.
         /// Allows zoomFactor between 0.5 and 2.0 times of base zoom.
         /// </summary>
-        private void HandleZoomEvents()
-        {
+        private void HandleZoomEvents() {
             Event currentEvent = Event.current;
-            if (currentEvent.type == EventType.ScrollWheel)
-            {
+            if(currentEvent.type == EventType.ScrollWheel) {
                 float zoomDelta = -currentEvent.delta.y * 0.05f;
                 _zoomFactor = Mathf.Clamp(_zoomFactor + zoomDelta, 0.5f, 2.0f);
                 currentEvent.Use();
@@ -168,8 +153,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
         /// Draw the sprite and its canvas (scrollable area).
         /// Handle recentering and popup window.
         /// </summary>
-        private void DrawSpriteAndCanvas()
-        {
+        private void DrawSpriteAndCanvas() {
             _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, true, true, GUILayout.ExpandWidth(true),
                 GUILayout.ExpandHeight(true));
 
@@ -183,7 +167,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
             Rect spriteRect = CalculateSpriteRect(bigCanvasRect, spriteWidth, spriteHeight);
 
             DrawGridBackground(spriteRect);
-            
+
             var outerUV = UnityEngine.Sprites.DataUtility.GetOuterUV(CurrentSprite);
             Rect uvRect = new Rect(
                 outerUV.x,
@@ -194,7 +178,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
 
             // Draw only the sprite portion of the atlas
             GUI.DrawTextureWithTexCoords(spriteRect, _spriteTexture, uvRect, true);
-            
+
             DrawSpriteBoundary(spriteRect);
             DrawBorders(spriteRect);
             DrawIntersections(spriteRect);
@@ -203,8 +187,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
 
             EditorGUILayout.EndScrollView();
 
-            if (_recenterPending && Event.current.type == EventType.Repaint)
-            {
+            if(_recenterPending && Event.current.type == EventType.Repaint) {
                 CenterSpriteInScroll(bigCanvasWidth, bigCanvasHeight, spriteRect);
                 _recenterPending = false;
                 Repaint();
@@ -216,8 +199,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
         /// <summary>
         /// Calculate the rect in which the sprite should be drawn, centered within the given container.
         /// </summary>
-        private Rect CalculateSpriteRect(Rect containerRect, float spriteWidth, float spriteHeight)
-        {
+        private Rect CalculateSpriteRect(Rect containerRect, float spriteWidth, float spriteHeight) {
             float offsetX = containerRect.x + (containerRect.width - spriteWidth) / 2f;
             float offsetY = containerRect.y + (containerRect.height - spriteHeight) / 2f;
             return new Rect(offsetX, offsetY, spriteWidth, spriteHeight);
@@ -226,8 +208,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
         /// <summary>
         /// Recenter the scroll view so that the sprite is displayed in the center of the window.
         /// </summary>
-        private void CenterSpriteInScroll(float bigCanvasWidth, float bigCanvasHeight, Rect spriteRect)
-        {
+        private void CenterSpriteInScroll(float bigCanvasWidth, float bigCanvasHeight, Rect spriteRect) {
             float visibleWidth = position.width;
             float visibleHeight = position.height;
 
@@ -245,8 +226,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
         /// <summary>
         /// Draws the main background with a dark gray diagonal pattern.
         /// </summary>
-        private void DrawMainBackground(Rect windowRect)
-        {
+        private void DrawMainBackground(Rect windowRect) {
             Color baseColor = new Color(0.15f, 0.15f, 0.15f, 0.5f);
             EditorGUI.DrawRect(windowRect, baseColor);
 
@@ -254,8 +234,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
             Handles.color = new Color(0.1f, 0.1f, 0.1f, 0.5f);
 
             float spacing = 20f;
-            for (float startX = -windowRect.height; startX < windowRect.width; startX += spacing)
-            {
+            for(float startX = -windowRect.height; startX < windowRect.width; startX += spacing) {
                 Vector3 start = new Vector3(startX, 0, 0);
                 Vector3 end = new Vector3(startX + windowRect.height, windowRect.height, 0);
                 Handles.DrawLine(start, end);
@@ -267,8 +246,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
         /// <summary>
         /// Draws a checkered grid background behind the sprite.
         /// </summary>
-        private void DrawGridBackground(Rect rect)
-        {
+        private void DrawGridBackground(Rect rect) {
             Handles.BeginGUI();
 
             Color darkGray = new Color(0.2f, 0.2f, 0.2f);
@@ -284,10 +262,8 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
             int gridXCount = fullGridXCount + (leftoverWidth > 0.001f ? 1 : 0);
             int gridYCount = fullGridYCount + (leftoverHeight > 0.001f ? 1 : 0);
 
-            for (int x = 0; x < gridXCount; x++)
-            {
-                for (int y = 0; y < gridYCount; y++)
-                {
+            for(int x = 0; x < gridXCount; x++) {
+                for(int y = 0; y < gridYCount; y++) {
                     bool isDark = (x + y) % 2 == 0;
                     float cellWidth = (x == gridXCount - 1 && leftoverWidth > 0.001f) ? leftoverWidth : gridSize;
                     float cellHeight = (y == gridYCount - 1 && leftoverHeight > 0.001f) ? leftoverHeight : gridSize;
@@ -303,8 +279,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
         /// <summary>
         /// Draws a cyan boundary around the sprite.
         /// </summary>
-        private void DrawSpriteBoundary(Rect spriteRect)
-        {
+        private void DrawSpriteBoundary(Rect spriteRect) {
             Color outlineColor = new Color(56f / 255f, 118f / 255f, 1f, 1f);
 
             Handles.BeginGUI();
@@ -316,25 +291,22 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
         /// <summary>
         /// Draws vertical and horizontal borders lines on the sprite.
         /// </summary>
-        private void DrawBorders(Rect spriteRect)
-        {
+        private void DrawBorders(Rect spriteRect) {
             Handles.BeginGUI();
             Handles.color = Color.green;
 
             // Vertical lines
-            for (int i = 0; i < 4; i++)
-            {
-                float x = spriteRect.x + spriteRect.width * _verticalBorders[i] / 100f;
+            for(int i = 0; i < 4; i++) {
+                float x = spriteRect.x + (spriteRect.width * _xBorders[i]);
                 Handles.DrawLine(new Vector3(x, spriteRect.y), new Vector3(x, spriteRect.y + spriteRect.height));
-                Handles.Label(new Vector3(x - 5, spriteRect.y - 20), $"V{i + 1}");
+                Handles.Label(new Vector3(x - 5, spriteRect.y - 20), $"X{i + 1}");
             }
 
             // Horizontal lines
-            for (int i = 0; i < 4; i++)
-            {
-                float y = spriteRect.y + spriteRect.height * _horizontalBorders[i] / 100f;
+            for(int i = 0; i < 4; i++) {
+                float y = spriteRect.y + (spriteRect.height * _yBorders[i]);
                 Handles.DrawLine(new Vector3(spriteRect.x, y), new Vector3(spriteRect.x + spriteRect.width, y));
-                Handles.Label(new Vector3(spriteRect.x + spriteRect.width + 5, y), $"H{i + 1}");
+                Handles.Label(new Vector3(spriteRect.x + spriteRect.width + 5, y), $"Y{i + 1}");
             }
 
             Handles.EndGUI();
@@ -343,16 +315,13 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
         /// <summary>
         /// Draws intersection points of vertical and horizontal lines.
         /// </summary>
-        private void DrawIntersections(Rect spriteRect)
-        {
+        private void DrawIntersections(Rect spriteRect) {
             Handles.BeginGUI();
 
-            for (int i = 0; i < 4; i++)
-            {
-                for (int j = 0; j < 4; j++)
-                {
-                    float x = spriteRect.x + spriteRect.width * _verticalBorders[j] / 100f;
-                    float y = spriteRect.y + spriteRect.height * _horizontalBorders[i] / 100f;
+            for(int i = 0; i < 4; i++) {
+                for(int j = 0; j < 4; j++) {
+                    float x = spriteRect.x + (spriteRect.width * _xBorders[j]);
+                    float y = spriteRect.y + (spriteRect.height * _yBorders[i]);
 
                     Handles.color = Color.green;
                     Handles.DrawSolidRectangleWithOutline(new Rect(x - 2, y - 2, 4, 4), Color.green, Color.black);
@@ -365,21 +334,15 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
         /// <summary>
         /// Handles mouse input for dragging lines and intersections.
         /// </summary>
-        private void HandleInput(Rect spriteRect)
-        {
+        private void HandleInput(Rect spriteRect) {
             Event currentEvent = Event.current;
             Vector2 mousePos = currentEvent.mousePosition;
 
-            if (currentEvent.type == EventType.MouseDown)
-            {
+            if(currentEvent.type == EventType.MouseDown) {
                 TryBeginDrag(spriteRect, mousePos, currentEvent);
-            }
-            else if (currentEvent.type == EventType.MouseDrag && _dragInfo.IsDragging())
-            {
+            } else if(currentEvent.type == EventType.MouseDrag && _dragInfo.IsDragging()) {
                 UpdateDrag(spriteRect, mousePos, currentEvent);
-            }
-            else if (currentEvent.type == EventType.MouseUp && _dragInfo.IsDragging())
-            {
+            } else if(currentEvent.type == EventType.MouseUp && _dragInfo.IsDragging()) {
                 EndDrag();
             }
 
@@ -389,25 +352,21 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
         /// <summary>
         /// Attempt to begin dragging a line or intersection handle.
         /// </summary>
-        private void TryBeginDrag(Rect spriteRect, Vector2 mousePos, Event currentEvent)
-        {
-            if (CheckIntersectionHandleHover(spriteRect, mousePos, out int interH, out int interV))
-            {
+        private void TryBeginDrag(Rect spriteRect, Vector2 mousePos, Event currentEvent) {
+            if(CheckIntersectionHandleHover(spriteRect, mousePos, out int interH, out int interV)) {
                 _dragInfo.SetDraggingState(DraggingState.Intersection, interV, interH, MouseCursor.ResizeUpLeft);
                 currentEvent.Use();
                 return;
             }
 
-            if (CheckVerticalHandleHover(spriteRect, mousePos, out int vIndex))
-            {
-                _dragInfo.SetDraggingState(DraggingState.Vertical, vIndex, -1, MouseCursor.ResizeHorizontal);
+            if(CheckHorizontalHandleHover(spriteRect, mousePos, out int vIndex)) {
+                _dragInfo.SetDraggingState(DraggingState.Horizontal, vIndex, -1, MouseCursor.ResizeHorizontal);
                 currentEvent.Use();
                 return;
             }
 
-            if (CheckHorizontalHandleHover(spriteRect, mousePos, out int hIndex))
-            {
-                _dragInfo.SetDraggingState(DraggingState.Horizontal, -1, hIndex, MouseCursor.ResizeVertical);
+            if(CheckVerticalHandleHover(spriteRect, mousePos, out int hIndex)) {
+                _dragInfo.SetDraggingState(DraggingState.Vertical, -1, hIndex, MouseCursor.ResizeVertical);
                 currentEvent.Use();
                 return;
             }
@@ -416,77 +375,63 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
         /// <summary>
         /// Update dragging logic (vertical, horizontal, or intersection) while mouse is moved.
         /// </summary>
-        private void UpdateDrag(Rect spriteRect, Vector2 mousePos, Event currentEvent)
-        {
-            (DraggingState state, int vIndex, int hIndex) = _dragInfo.GetDraggingState();
+        private void UpdateDrag(Rect spriteRect, Vector2 mousePos, Event currentEvent) {
+            (DraggingState state, int xIndex, int yIndex) = _dragInfo.GetDraggingState();
 
-            if (state == DraggingState.Vertical)
-                UpdateVerticalDrag(spriteRect, mousePos, vIndex);
-            else if (state == DraggingState.Horizontal)
-                UpdateHorizontalDrag(spriteRect, mousePos, hIndex);
-            else if (state == DraggingState.Intersection)
-                UpdateIntersectionDrag(spriteRect, mousePos, vIndex, hIndex);
+            if(state == DraggingState.Horizontal)
+                UpdateXDrag(spriteRect, mousePos, xIndex);
+            else if(state == DraggingState.Vertical)
+                UpdateYDrag(spriteRect, mousePos, yIndex);
+            else if(state == DraggingState.Intersection)
+                UpdateIntersectionDrag(spriteRect, mousePos, xIndex, yIndex);
 
             currentEvent.Use();
         }
 
-        private void EndDrag()
-        {
+        private void EndDrag() {
             _dragInfo.ClearDraggingState();
         }
 
         /// <summary>
         /// Update cursor icon depending on whether the mouse is over a handle or not.
         /// </summary>
-        private void UpdateCursorIcon(Rect spriteRect, Vector2 mousePos)
-        {
-            if (_dragInfo.IsDragging())
-            {
+        private void UpdateCursorIcon(Rect spriteRect, Vector2 mousePos) {
+            if(_dragInfo.IsDragging()) {
                 Rect fullRect = new Rect(0, 0, position.width, position.height);
                 EditorGUIUtility.AddCursorRect(fullRect, _dragInfo.GetCurrentDragCursor());
-            }
-            else
-            {
+            } else {
                 SetCursorIfOverHandle(spriteRect, mousePos);
             }
         }
 
-        private void SetCursorIfOverHandle(Rect spriteRect, Vector2 mousePos)
-        {
-            if (CheckIntersectionHandleHover(spriteRect, mousePos, out _, out _))
-            {
+        private void SetCursorIfOverHandle(Rect spriteRect, Vector2 mousePos) {
+            if(CheckIntersectionHandleHover(spriteRect, mousePos, out _, out _)) {
                 EditorGUIUtility.AddCursorRect(new Rect(mousePos.x - 5, mousePos.y - 5, 10, 10),
                     MouseCursor.ResizeUpLeft);
                 return;
             }
 
-            if (CheckVerticalHandleHover(spriteRect, mousePos, out _))
-            {
+            if(CheckHorizontalHandleHover(spriteRect, mousePos, out _)) {
                 EditorGUIUtility.AddCursorRect(new Rect(mousePos.x - 5, spriteRect.y, 10, spriteRect.height),
                     MouseCursor.ResizeHorizontal);
                 return;
             }
 
-            if (CheckHorizontalHandleHover(spriteRect, mousePos, out _))
-            {
+            if(CheckVerticalHandleHover(spriteRect, mousePos, out _)) {
                 EditorGUIUtility.AddCursorRect(new Rect(spriteRect.x, mousePos.y - 5, spriteRect.width, 10),
                     MouseCursor.ResizeVertical);
                 return;
             }
         }
 
-        private bool CheckIntersectionHandleHover(Rect spriteRect, Vector2 mousePos, out int hIndex, out int vIndex)
-        {
+        private bool CheckIntersectionHandleHover(Rect spriteRect, Vector2 mousePos, out int hIndex, out int vIndex) {
             float tolerance = 10f;
-            for (int i = 0; i < 4; i++)
-            {
-                for (int j = 0; j < 4; j++)
-                {
-                    float x = spriteRect.x + spriteRect.width * _verticalBorders[j] / 100f;
-                    float y = spriteRect.y + spriteRect.height * _horizontalBorders[i] / 100f;
+            for(int i = 0; i < 4; i++) {
+                for(int j = 0; j < 4; j++) {
+                    float x = spriteRect.x + (spriteRect.width * _xBorders[j]);
+                    float y = spriteRect.y + (spriteRect.height * _yBorders[i]);
                     Rect intersectionHandleRect = new Rect(x - tolerance, y - tolerance, 2 * tolerance, 2 * tolerance);
-                    if (intersectionHandleRect.Contains(mousePos))
-                    {
+                    if(intersectionHandleRect.Contains(mousePos)) {
                         hIndex = i;
                         vIndex = j;
                         return true;
@@ -499,35 +444,13 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
             return false;
         }
 
-        private bool CheckVerticalHandleHover(Rect spriteRect, Vector2 mousePos, out int vIndex)
-        {
+        private bool CheckHorizontalHandleHover(Rect spriteRect, Vector2 mousePos, out int hIndex) {
             float tolerance = 10f;
-            for (int i = 0; i < 4; i++)
-            {
-                float x = spriteRect.x + spriteRect.width * _verticalBorders[i] / 100f;
+            for(int i = 0; i < 4; i++) {
+                float x = spriteRect.x + (spriteRect.width * _xBorders[i]);
                 Rect verticalHandleRect =
                     new Rect(x - 5 - tolerance, spriteRect.y, 10 + 2 * tolerance, spriteRect.height);
-                if (verticalHandleRect.Contains(mousePos))
-                {
-                    vIndex = i;
-                    return true;
-                }
-            }
-
-            vIndex = -1;
-            return false;
-        }
-
-        private bool CheckHorizontalHandleHover(Rect spriteRect, Vector2 mousePos, out int hIndex)
-        {
-            float tolerance = 10f;
-            for (int i = 0; i < 4; i++)
-            {
-                float y = spriteRect.y + spriteRect.height * _horizontalBorders[i] / 100f;
-                Rect horizontalHandleRect =
-                    new Rect(spriteRect.x, y - 5 - tolerance, spriteRect.width, 10 + 2 * tolerance);
-                if (horizontalHandleRect.Contains(mousePos))
-                {
+                if(verticalHandleRect.Contains(mousePos)) {
                     hIndex = i;
                     return true;
                 }
@@ -537,47 +460,69 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
             return false;
         }
 
-        private void UpdateVerticalDrag(Rect spriteRect, Vector2 mousePos, int vIndex)
-        {
-            float clampedX = ClampVerticalPosition(spriteRect, mousePos.x, vIndex);
-            _verticalBorders[vIndex] = (clampedX - spriteRect.x) / spriteRect.width * 100f;
+        private bool CheckVerticalHandleHover(Rect spriteRect, Vector2 mousePos, out int vIndex) {
+            float tolerance = 10f;
+            for(int i = 0; i < 4; i++) {
+                float y = spriteRect.y + (spriteRect.height * _yBorders[i]);
+                Rect horizontalHandleRect =
+                    new Rect(spriteRect.x, y - 5 - tolerance, spriteRect.width, 10 + 2 * tolerance);
+                if(horizontalHandleRect.Contains(mousePos)) {
+                    vIndex = i;
+                    return true;
+                }
+            }
+
+            vIndex = -1;
+            return false;
         }
 
-        private void UpdateHorizontalDrag(Rect spriteRect, Vector2 mousePos, int hIndex)
-        {
-            float clampedY = ClampHorizontalPosition(spriteRect, mousePos.y, hIndex);
-            _horizontalBorders[hIndex] = (clampedY - spriteRect.y) / spriteRect.height * 100f;
+        private void UpdateXDrag(Rect spriteRect, Vector2 mousePos, int xIndex) {
+            var clampedX = ClampXPosition(spriteRect, mousePos.x, xIndex);
+            MoveX(clampedX, spriteRect, xIndex);
         }
 
-        private void UpdateIntersectionDrag(Rect spriteRect, Vector2 mousePos, int vIndex, int hIndex)
-        {
-            float clampedX = ClampVerticalPosition(spriteRect, mousePos.x, vIndex);
-            float clampedY = ClampHorizontalPosition(spriteRect, mousePos.y, hIndex);
-
-            _verticalBorders[vIndex] = (clampedX - spriteRect.x) / spriteRect.width * 100f;
-            _horizontalBorders[hIndex] = (clampedY - spriteRect.y) / spriteRect.height * 100f;
+        private void UpdateYDrag(Rect spriteRect, Vector2 mousePos, int yIndex) {
+            float clampedY = ClampYPosition(spriteRect, mousePos.y, yIndex);
+            MoveY(clampedY, spriteRect, yIndex);
         }
 
-        private float ClampVerticalPosition(Rect spriteRect, float mouseX, int index)
-        {
-            float minX = spriteRect.x + (index > 0 ? (_verticalBorders[index - 1] / 100f) * spriteRect.width : 0);
-            float maxX = spriteRect.x + (index < _verticalBorders.Length - 1
-                ? (_verticalBorders[index + 1] / 100f) * spriteRect.width
+        private void UpdateIntersectionDrag(Rect spriteRect, Vector2 mousePos, int xIndex, int yIndex) {
+            float clampedX = ClampXPosition(spriteRect, mousePos.x, xIndex);
+            float clampedY = ClampYPosition(spriteRect, mousePos.y, yIndex);
+
+            MoveX(clampedX, spriteRect, xIndex);
+            MoveY(clampedY, spriteRect, yIndex);
+        }
+
+        private void MoveX(float x, Rect spriteRect, int vIndex) {
+            var normalizedValue = (x - spriteRect.x) / spriteRect.width;
+            var pixelBound = Mathf.Round(normalizedValue * CurrentSprite.rect.width);
+            _xBorders[vIndex] = (pixelBound / CurrentSprite.rect.width);
+        }
+
+        private void MoveY(float y, Rect spriteRect, int hIndex) {
+            var normalizedValue = (y - spriteRect.y) / spriteRect.height;
+            var pixelBound = Mathf.Round(normalizedValue * CurrentSprite.rect.height);
+            _yBorders[hIndex] = (pixelBound / CurrentSprite.rect.height);
+        }
+
+        private float ClampXPosition(Rect spriteRect, float mouseX, int index) {
+            float minX = spriteRect.x + (index > 0 ? _xBorders[index - 1] * spriteRect.width : 0);
+            float maxX = spriteRect.x + (index < _xBorders.Length - 1
+                ? _xBorders[index + 1] * spriteRect.width
                 : spriteRect.width);
             return Mathf.Clamp(mouseX, minX, maxX);
         }
 
-        private float ClampHorizontalPosition(Rect spriteRect, float mouseY, int index)
-        {
-            float minY = spriteRect.y + (index > 0 ? (_horizontalBorders[index - 1] / 100f) * spriteRect.height : 0);
-            float maxY = spriteRect.y + (index < _horizontalBorders.Length - 1
-                ? (_horizontalBorders[index + 1] / 100f) * spriteRect.height
+        private float ClampYPosition(Rect spriteRect, float mouseY, int index) {
+            float minY = spriteRect.y + (index > 0 ? _yBorders[index - 1] * spriteRect.height : 0);
+            float maxY = spriteRect.y + (index < _yBorders.Length - 1
+                ? _yBorders[index + 1] * spriteRect.height
                 : spriteRect.height);
             return Mathf.Clamp(mouseY, minY, maxY);
         }
 
-        private void DrawPopupWindow()
-        {
+        private void DrawPopupWindow() {
             float popupWidth = 300;
             float popupHeight = 200;
             Rect popupRect = new Rect(position.width - popupWidth - 20, position.height - popupHeight - 20, popupWidth,
@@ -613,33 +558,26 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
             GUILayout.EndHorizontal();
             GUILayout.Space(10);
 
+            var l = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 30;
+
             GUILayout.BeginHorizontal();
+            GUILayout.Space(20);
+            GUILayout.BeginVertical();
 
             // ========== Vertical Borders ==========
-            GUILayout.BeginVertical();
-            GUILayout.Label("Vertical Borders", boldCenterLabel);
+            GUILayout.Label("X Borders", boldCenterLabel);
 
-            float labelWidth = 30f;
-            float fieldWidth = 80f;
+            for(int i = 0; i < 4; i++) {
 
-            for (int i = 0; i < 4; i++)
-            {
-                GUILayout.BeginHorizontal();
-
-                GUILayout.Label($"V{i + 1}", GUILayout.Width(labelWidth));
-
-                float newValue = EditorGUILayout.FloatField(
-                    _verticalBorders[i],
-                    GUILayout.Width(fieldWidth)
-                );
+                float newValue = EditorGUILayout.IntField($"X{i + 1}", Mathf.RoundToInt(_xBorders[i] * CurrentSprite.rect.width));
 
                 // Clamp
-                float min = (i > 0) ? _verticalBorders[i - 1] : 0f;
-                float max = (i < 3) ? _verticalBorders[i + 1] : 100f;
+                float min = (i > 0) ? _xBorders[i - 1] * CurrentSprite.rect.width : 0f;
+                float max = (i < 3) ? _xBorders[i + 1] * CurrentSprite.rect.width : CurrentSprite.rect.width;
                 newValue = Mathf.Clamp(newValue, min, max);
 
-                _verticalBorders[i] = newValue;
-                GUILayout.EndHorizontal();
+                _xBorders[i] = Mathf.InverseLerp(0, CurrentSprite.rect.width, newValue);
             }
 
             GUILayout.EndVertical();
@@ -648,30 +586,28 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
 
             // ========== Horizontal Borders ==========
             GUILayout.BeginVertical();
-            GUILayout.Label("Horizontal Borders", boldCenterLabel);
+            GUILayout.Label("Y Borders", boldCenterLabel);
 
-            for (int i = 0; i < 4; i++)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label($"H{i + 1}", GUILayout.Width(labelWidth));
+            for(int i = 0; i < 4; i++) {
 
-                float newValue = EditorGUILayout.FloatField(
-                    _horizontalBorders[i],
-                    GUILayout.Width(fieldWidth)
-                );
+                float newValue = EditorGUILayout.IntField($"Y{i + 1}", Mathf.RoundToInt(_yBorders[i] * CurrentSprite.rect.height));
 
-                float min = (i > 0) ? _horizontalBorders[i - 1] : 0f;
-                float max = (i < 3) ? _horizontalBorders[i + 1] : 100f;
+                float min = (i > 0) ? (_yBorders[i - 1] * CurrentSprite.rect.height) : 0f;
+                float max = (i < 3) ? (_yBorders[i + 1] * CurrentSprite.rect.height) : CurrentSprite.rect.height;
                 newValue = Mathf.Clamp(newValue, min, max);
 
-                _horizontalBorders[i] = newValue;
-                GUILayout.EndHorizontal();
+                _yBorders[i] = Mathf.InverseLerp(0, CurrentSprite.rect.height, newValue);
             }
 
             GUILayout.EndVertical();
 
+            GUILayout.Space(20);
+
             GUILayout.EndHorizontal();
+
             GUILayout.Space(15);
+
+            EditorGUIUtility.labelWidth = l;
 
             GUIStyle saveButtonStyle = new GUIStyle(GUI.skin.button)
             {
@@ -683,8 +619,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
 
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Save", saveButtonStyle, GUILayout.Height(30), GUILayout.Width(250)))
-            {
+            if(GUILayout.Button("Save", saveButtonStyle, GUILayout.Height(30), GUILayout.Width(250))) {
                 SaveBorders();
             }
 
@@ -695,12 +630,11 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
             GUILayout.EndArea();
         }
 
-        private void SaveBorders()
-        {
+        private void SaveBorders() {
             TwentyFiveSliceData sliceData = new TwentyFiveSliceData
             {
-                verticalBorders = _verticalBorders,
-                horizontalBorders = _horizontalBorders
+                xBorders = _xBorders,
+                yBorders = _yBorders
             };
             SliceDataManager.Instance.SaveSliceData(CurrentSprite, sliceData);
         }
