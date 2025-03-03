@@ -55,7 +55,7 @@ namespace TwentyFiveSlicer.Runtime
         [FormerlySerializedAs("_size")]
         [Tooltip("The final width and height of the 25-slice mesh. If (0,0), uses the sprite's original pixel size.")]
         [SerializeField]
-        private Vector2 size = Vector2.zero;
+        private Vector2 size = Vector2.one;
 
         [FormerlySerializedAs("_sortingLayerName")] [Header("Sorting")] [SerializeField]
         private string sortingLayerName = "Default";
@@ -537,7 +537,7 @@ namespace TwentyFiveSlicer.Runtime
                 sliceData.xBorders[1],
                 sliceData.xBorders[2],
                 sliceData.xBorders[3],
-                100f
+                1f
             };
         }
 
@@ -546,11 +546,11 @@ namespace TwentyFiveSlicer.Runtime
             return new[]
             {
                 0f,
-                100f - sliceData.yBorders[3],
-                100f - sliceData.yBorders[2],
-                100f - sliceData.yBorders[1],
-                100f - sliceData.yBorders[0],
-                100f
+                1f - sliceData.yBorders[3],
+                1f - sliceData.yBorders[2],
+                1f - sliceData.yBorders[1],
+                1f - sliceData.yBorders[0],
+                1f
             };
         }
 
