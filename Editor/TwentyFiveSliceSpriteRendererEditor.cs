@@ -53,10 +53,17 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
 
             // Sprite & Debug
             EditorGUILayout.PropertyField(_spSprite,     new GUIContent("Sprite"));
-            EditorGUILayout.PropertyField(_spDebugView,  new GUIContent("Debug View"));
             EditorGUILayout.PropertyField(_spColor,      new GUIContent("Color"));
-            EditorGUILayout.PropertyField(_spFlipX,      new GUIContent("Flip X"));
-            EditorGUILayout.PropertyField(_spFlipY,      new GUIContent("Flip Y"));
+            EditorGUILayout.BeginHorizontal();
+            var width = EditorGUIUtility.singleLineHeight - 5;
+            EditorGUILayout.PrefixLabel("Flip");
+            EditorGUILayout.PropertyField(_spFlipX, new GUIContent(), GUILayout.Width(width));
+            EditorGUILayout.LabelField("X", GUILayout.Width(width));
+            EditorGUILayout.PropertyField(_spFlipY, new GUIContent(), GUILayout.Width(width));
+            EditorGUILayout.LabelField("Y", GUILayout.Width(width));
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.PropertyField(_spSize, new GUIContent("Size"));
 
             // Pivot & Size
             EditorGUILayout.PropertyField(_spUseSpritePivot, new GUIContent("Use Sprite Pivot"));
@@ -68,10 +75,15 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
             }
 
             EditorGUILayout.PropertyField(_spPixelsPerUnit, new GUIContent("Pixels Per Unit"));
-            EditorGUILayout.PropertyField(_spSize,          new GUIContent("Size"));
+
 
             // Sorting Layer & Order
-            SortingLayerField(_spSortingLayerName, _spSortingOrder);
+            _spSortingLayerName.isExpanded = EditorGUILayout.Foldout(_spSortingLayerName.isExpanded, "Additional Settings");
+            if(_spSortingLayerName.isExpanded) {
+                ++EditorGUI.indentLevel;
+                SortingLayerField(_spSortingLayerName, _spSortingOrder);
+                --EditorGUI.indentLevel;
+            }
 
             // --- 25-Slice Data Warning ---
             // If there's a sprite but no slice data, show a HelpBox
@@ -82,6 +94,14 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
                 {
                     EditorGUILayout.HelpBox(NoSliceDataWarning, MessageType.Warning);
                 }
+            }
+
+
+            _spDebugView.isExpanded = EditorGUILayout.Foldout(_spDebugView.isExpanded, new GUIContent("Debugging"));
+            if(_spDebugView.isExpanded) {
+                ++EditorGUI.indentLevel;
+                EditorGUILayout.PropertyField(_spDebugView, new GUIContent("Debug View"));
+                --EditorGUI.indentLevel;
             }
 
             serializedObject.ApplyModifiedProperties();

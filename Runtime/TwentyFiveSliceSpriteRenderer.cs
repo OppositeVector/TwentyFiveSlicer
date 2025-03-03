@@ -2,8 +2,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace TwentyFiveSlicer.Runtime
-{
+namespace TwentyFiveSlicer.Runtime {
     /// <summary>
     /// A 25-slice renderer that behaves similarly to a SpriteRenderer:
     /// - Based on MeshRenderer + MeshFilter.
@@ -13,13 +12,13 @@ namespace TwentyFiveSlicer.Runtime
     /// </summary>
     [ExecuteInEditMode]
     [RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
-    public class TwentyFiveSliceSpriteRenderer : MonoBehaviour
-    {
+    public class TwentyFiveSliceSpriteRenderer : MonoBehaviour {
         //========================================================
         // Inspector Fields
         //========================================================
 
-        [FormerlySerializedAs("_sprite")] [Header("Sprite & 25-Slice Settings")] [SerializeField]
+        [FormerlySerializedAs("_sprite")]
+        [SerializeField]
         private Sprite sprite;
 
         [FormerlySerializedAs("_debuggingView")]
@@ -27,17 +26,19 @@ namespace TwentyFiveSlicer.Runtime
         [SerializeField]
         private bool debuggingView;
 
-        [FormerlySerializedAs("_color")] [Header("Renderer Basic Settings")] [SerializeField]
+        [FormerlySerializedAs("_color")]
+        [SerializeField]
         private Color color = Color.white;
 
-        [FormerlySerializedAs("_flipX")] [SerializeField]
+        [FormerlySerializedAs("_flipX")]
+        [SerializeField]
         private bool flipX;
 
-        [FormerlySerializedAs("_flipY")] [SerializeField]
+        [FormerlySerializedAs("_flipY")]
+        [SerializeField]
         private bool flipY;
 
         [FormerlySerializedAs("_useSpritePivot")]
-        [Header("Pivot & Size")]
         [Tooltip("If true, uses the sprite.pivot. If false, uses the customPivot field.")]
         [SerializeField]
         private bool useSpritePivot = true;
@@ -57,11 +58,15 @@ namespace TwentyFiveSlicer.Runtime
         [SerializeField]
         private Vector2 size = Vector2.one;
 
-        [FormerlySerializedAs("_sortingLayerName")] [Header("Sorting")] [SerializeField]
+        [FormerlySerializedAs("_sortingLayerName")]
+        [SerializeField]
         private string sortingLayerName = "Default";
 
-        [FormerlySerializedAs("_sortingOrder")] [SerializeField]
+        [FormerlySerializedAs("_sortingOrder")]
+        [SerializeField]
         private int sortingOrder;
+
+        [SerializeField] private Vector2 _ratio;
 
         //========================================================
         // Internal Fields
@@ -81,13 +86,11 @@ namespace TwentyFiveSlicer.Runtime
         // MonoBehaviour Methods
         //========================================================
 
-        private void OnEnable()
-        {
+        private void OnEnable() {
             _meshRenderer = GetComponent<MeshRenderer>();
             _meshFilter = GetComponent<MeshFilter>();
 
-            if (_generatedMesh == null)
-            {
+            if(_generatedMesh == null) {
                 _generatedMesh = new Mesh { name = "TwentyFiveSliceMesh (Generated)" };
             }
 
@@ -95,15 +98,13 @@ namespace TwentyFiveSlicer.Runtime
             RebuildMeshIfNeeded();
         }
 
-        private void OnValidate()
-        {
+        private void OnValidate() {
             // Called when inspector values change
             _needMeshUpdate = true;
             UpdateRendererSettings();
         }
 
-        private void Update()
-        {
+        private void Update() {
             RebuildMeshIfNeeded();
         }
 
@@ -114,12 +115,10 @@ namespace TwentyFiveSlicer.Runtime
         /// <summary>
         /// The sprite to be rendered in this 25-slice mesh.
         /// </summary>
-        public Sprite Sprite
-        {
+        public Sprite Sprite {
             get => sprite;
-            set
-            {
-                if (sprite == value) return;
+            set {
+                if(sprite == value) return;
                 sprite = value;
                 _needMeshUpdate = true;
             }
@@ -128,11 +127,9 @@ namespace TwentyFiveSlicer.Runtime
         /// <summary>
         /// Rendering color (applied to the material).
         /// </summary>
-        public Color Color
-        {
+        public Color Color {
             get => color;
-            set
-            {
+            set {
                 color = value;
                 UpdateRendererSettings();
             }
@@ -141,12 +138,10 @@ namespace TwentyFiveSlicer.Runtime
         /// <summary>
         /// Flip horizontally.
         /// </summary>
-        public bool FlipX
-        {
+        public bool FlipX {
             get => flipX;
-            set
-            {
-                if (flipX == value) return;
+            set {
+                if(flipX == value) return;
                 flipX = value;
                 _needMeshUpdate = true;
             }
@@ -155,12 +150,10 @@ namespace TwentyFiveSlicer.Runtime
         /// <summary>
         /// Flip vertically.
         /// </summary>
-        public bool FlipY
-        {
+        public bool FlipY {
             get => flipY;
-            set
-            {
-                if (flipY == value) return;
+            set {
+                if(flipY == value) return;
                 flipY = value;
                 _needMeshUpdate = true;
             }
@@ -169,12 +162,10 @@ namespace TwentyFiveSlicer.Runtime
         /// <summary>
         /// If true, shows a debug color distribution in the 25-slice (for each slice area).
         /// </summary>
-        public bool DebuggingView
-        {
+        public bool DebuggingView {
             get => debuggingView;
-            set
-            {
-                if (debuggingView == value) return;
+            set {
+                if(debuggingView == value) return;
                 debuggingView = value;
                 _needMeshUpdate = true;
             }
@@ -183,12 +174,10 @@ namespace TwentyFiveSlicer.Runtime
         /// <summary>
         /// Whether to use the sprite's built-in pivot or a custom pivot.
         /// </summary>
-        public bool UseSpritePivot
-        {
+        public bool UseSpritePivot {
             get => useSpritePivot;
-            set
-            {
-                if (useSpritePivot == value) return;
+            set {
+                if(useSpritePivot == value) return;
                 useSpritePivot = value;
                 _needMeshUpdate = true;
             }
@@ -197,11 +186,9 @@ namespace TwentyFiveSlicer.Runtime
         /// <summary>
         /// A user-defined pivot if UseSpritePivot=false.
         /// </summary>
-        public Vector2 CustomPivot
-        {
+        public Vector2 CustomPivot {
             get => customPivot;
-            set
-            {
+            set {
                 customPivot = value;
                 _needMeshUpdate = true;
             }
@@ -210,11 +197,9 @@ namespace TwentyFiveSlicer.Runtime
         /// <summary>
         /// Pixels Per Unit override. If 0, uses sprite.pixelsPerUnit.
         /// </summary>
-        public float PixelsPerUnit
-        {
+        public float PixelsPerUnit {
             get => pixelsPerUnit;
-            set
-            {
+            set {
                 pixelsPerUnit = value;
                 _needMeshUpdate = true;
             }
@@ -224,15 +209,13 @@ namespace TwentyFiveSlicer.Runtime
         /// The final width/height of the 25-slice. If (0,0), uses sprite's original size.
         /// Similar to SpriteRenderer drawMode = Sliced's 'size' property.
         /// </summary>
-        public Vector2 Size
-        {
+        public Vector2 Size {
             get => size;
-            set
-            {
-                if (size == value) return;
+            set {
+                if(size == value) return;
                 size = value;
                 _needMeshUpdate = true;
-                
+
                 RebuildMeshIfNeeded();
             }
         }
@@ -240,14 +223,17 @@ namespace TwentyFiveSlicer.Runtime
         /// <summary>
         /// Local-space bounds of the generated mesh. For world-space, transform.TransformPoint is needed.
         /// </summary>
-        public Bounds Bounds
-        {
-            get
-            {
-                if (_generatedMesh != null)
+        public Bounds Bounds {
+            get {
+                if(_generatedMesh != null)
                     return _generatedMesh.bounds;
                 return new Bounds();
             }
+        }
+
+        public Vector2 Ratio {
+            get { return _ratio; }
+            set { _ratio = value; }
         }
 
         //========================================================
@@ -257,17 +243,15 @@ namespace TwentyFiveSlicer.Runtime
         /// <summary>
         /// Updates basic settings related to MeshRenderer, such as sorting and material color.
         /// </summary>
-        private void UpdateRendererSettings()
-        {
-            if (_meshRenderer == null) return;
+        private void UpdateRendererSettings() {
+            if(_meshRenderer == null) return;
 
             // Set the sorting layer and order
             _meshRenderer.sortingLayerName = sortingLayerName;
             _meshRenderer.sortingOrder = sortingOrder;
 
             // Ensure a material is assigned
-            if (_meshRenderer.sharedMaterial == null)
-            {
+            if(_meshRenderer.sharedMaterial == null) {
                 var mat = new Material(Shader.Find("Sprites/Default"));
                 mat.name = "TwentyFiveSliceMaterial";
                 _meshRenderer.sharedMaterial = mat;
@@ -280,16 +264,14 @@ namespace TwentyFiveSlicer.Runtime
         /// <summary>
         /// Rebuild the mesh if the flag is set.
         /// </summary>
-        private void RebuildMeshIfNeeded()
-        {
-            if (!_needMeshUpdate) return;
+        private void RebuildMeshIfNeeded() {
+            if(!_needMeshUpdate) return;
             _needMeshUpdate = false;
 
-            if (sprite == null)
-            {
+            if(sprite == null) {
                 // If no sprite, clear the mesh
-                if (_generatedMesh != null) _generatedMesh.Clear();
-                if (_meshFilter) _meshFilter.sharedMesh = _generatedMesh;
+                if(_generatedMesh != null) _generatedMesh.Clear();
+                if(_meshFilter) _meshFilter.sharedMesh = _generatedMesh;
                 return;
             }
 
@@ -300,13 +282,11 @@ namespace TwentyFiveSlicer.Runtime
         /// <summary>
         /// Core logic to build the 25-slice mesh.
         /// </summary>
-        private void BuildTwentyFiveSliceMesh(Mesh mesh, Sprite targetSprite)
-        {
+        private void BuildTwentyFiveSliceMesh(Mesh mesh, Sprite targetSprite) {
             mesh.Clear();
 
             // 1) Get 25-slice data from SliceDataManager
-            if (!SliceDataManager.Instance.TryGetSliceData(targetSprite, out var sliceData))
-            {
+            if(!SliceDataManager.Instance.TryGetSliceData(targetSprite, out var sliceData)) {
                 // If no slice data, just build a single quad
                 BuildSimpleQuad(mesh, targetSprite);
                 return;
@@ -315,17 +295,14 @@ namespace TwentyFiveSlicer.Runtime
             Rect spriteRect = targetSprite.rect;
             Vector4 outerUV = UnityEngine.Sprites.DataUtility.GetOuterUV(targetSprite);
             float realPpu = (pixelsPerUnit > 0f) ? pixelsPerUnit : targetSprite.pixelsPerUnit;
-            if (realPpu <= 0f) realPpu = 100f;
+            if(realPpu <= 0f) realPpu = 100f;
 
             // 2) Determine the final size
             Vector2 finalSize;
-            if (size.x > 0.0001f && size.y > 0.0001f)
-            {
+            if(size.x > 0.0001f && size.y > 0.0001f) {
                 // Use the inspector-specified size
                 finalSize = size;
-            }
-            else
-            {
+            } else {
                 // Use sprite's pixel dimensions
                 finalSize = new Vector2(spriteRect.width / realPpu, spriteRect.height / realPpu);
             }
@@ -341,32 +318,42 @@ namespace TwentyFiveSlicer.Runtime
             float[] originalWidths = GetOriginalSizes(xBordersPercent, spriteRect.width);
             float[] originalHeights = GetOriginalSizes(yBordersPercent, spriteRect.height);
 
+            // flipX/flipY
+            if(flipX) {
+                uvXBorders = uvXBorders.Reverse().ToArray();
+                originalWidths = originalWidths.Reverse().ToArray();
+            }
+            if(flipY) {
+                uvYBorders = uvYBorders.Reverse().ToArray();
+                originalHeights = originalHeights.Reverse().ToArray();
+            }
+
             // Distribute corners/edges (fixed) vs center (stretchable)
             float[] widths = GetAdjustedSizes(finalSize.x, originalWidths.Select(o => o / realPpu).ToArray(),
                 _fixedColumns);
             float[] heights = GetAdjustedSizes(finalSize.y, originalHeights.Select(o => o / realPpu).ToArray(),
                 _fixedRows);
 
-            // 3) pivot
-            Vector2 pivotOffset = useSpritePivot
-                ? (targetSprite.pivot / realPpu)
-                : customPivot;
 
             // Position arrays
             float[] xPositions = GetPositions(0, widths);
             float[] yPositions = GetPositions(0, heights);
 
-            // Subtract pivot
-            for (int i = 0; i < xPositions.Length; i++)
-                xPositions[i] -= pivotOffset.x;
-            for (int i = 0; i < yPositions.Length; i++)
-                yPositions[i] -= pivotOffset.y;
+            if(useSpritePivot) {
 
-            // flipX/flipY
-            if (flipX)
-                uvXBorders = uvXBorders.Reverse().ToArray();
-            if (flipY)
-                uvYBorders = uvYBorders.Reverse().ToArray();
+                var mid = new Vector2(xPositions[^1] - xPositions[0], yPositions[^1] - yPositions[0]);
+                mid -= mid * (Vector2.one - (targetSprite.pivot / targetSprite.rect.size));
+
+                for(int i = 0; i < xPositions.Length; ++i) {
+                    xPositions[i] -= mid.x;
+                    yPositions[i] -= mid.y;
+                }
+            } else {
+                for(int i = 0; i < xPositions.Length; ++i) {
+                    xPositions[i] -= customPivot.x;
+                    yPositions[i] -= customPivot.y;
+                }
+            }
 
             // 4) Build the mesh (25 slices max)
             var vertices = new Vector3[5 * 5 * 4];
@@ -377,13 +364,11 @@ namespace TwentyFiveSlicer.Runtime
             int vertIndex = 0;
             int triIndex = 0;
 
-            for (int row = 0; row < 5; row++)
-            {
-                for (int col = 0; col < 5; col++)
-                {
+            for(int row = 0; row < 5; row++) {
+                for(int col = 0; col < 5; col++) {
                     float w = widths[col];
                     float h = heights[row];
-                    if (w < 0.0001f || h < 0.0001f)
+                    if(w < 0.0001f || h < 0.0001f)
                         continue;
 
                     float xMin = xPositions[col];
@@ -450,8 +435,7 @@ namespace TwentyFiveSlicer.Runtime
             mesh.RecalculateNormals();
 
             // Assign the sprite texture to the material
-            if (_meshRenderer != null && _meshRenderer.sharedMaterial != null)
-            {
+            if(_meshRenderer != null && _meshRenderer.sharedMaterial != null) {
                 _meshRenderer.sharedMaterial.mainTexture = targetSprite.texture;
             }
         }
@@ -459,25 +443,21 @@ namespace TwentyFiveSlicer.Runtime
         /// <summary>
         /// Fallback when 25-slice data does not exist (just a single quad).
         /// </summary>
-        private void BuildSimpleQuad(Mesh mesh, Sprite targetSprite)
-        {
+        private void BuildSimpleQuad(Mesh mesh, Sprite targetSprite) {
             mesh.Clear();
 
             Rect spriteRect = targetSprite.rect;
             Vector4 uvRect = UnityEngine.Sprites.DataUtility.GetOuterUV(targetSprite);
 
             float realPpu = (pixelsPerUnit > 0f) ? pixelsPerUnit : targetSprite.pixelsPerUnit;
-            if (realPpu <= 0f) realPpu = 100f;
+            if(realPpu <= 0f) realPpu = 100f;
 
             // If size is zero, use the original sprite size
             float w, h;
-            if (size.x > 0.0001f && size.y > 0.0001f)
-            {
+            if(size.x > 0.0001f && size.y > 0.0001f) {
                 w = size.x;
                 h = size.y;
-            }
-            else
-            {
+            } else {
                 w = spriteRect.width / realPpu;
                 h = spriteRect.height / realPpu;
             }
@@ -518,8 +498,7 @@ namespace TwentyFiveSlicer.Runtime
             mesh.RecalculateBounds();
             mesh.RecalculateNormals();
 
-            if (_meshRenderer != null && _meshRenderer.sharedMaterial != null)
-            {
+            if(_meshRenderer != null && _meshRenderer.sharedMaterial != null) {
                 _meshRenderer.sharedMaterial.mainTexture = targetSprite.texture;
             }
         }
@@ -528,8 +507,7 @@ namespace TwentyFiveSlicer.Runtime
         // 25-slice helper methods
         //========================================================
 
-        private float[] GetXBordersPercent(TwentyFiveSliceData sliceData)
-        {
+        private float[] GetXBordersPercent(TwentyFiveSliceData sliceData) {
             return new[]
             {
                 0f,
@@ -541,8 +519,7 @@ namespace TwentyFiveSlicer.Runtime
             };
         }
 
-        private float[] GetYBordersPercent(TwentyFiveSliceData sliceData)
-        {
+        private float[] GetYBordersPercent(TwentyFiveSliceData sliceData) {
             return new[]
             {
                 0f,
@@ -554,8 +531,7 @@ namespace TwentyFiveSlicer.Runtime
             };
         }
 
-        private float[] GetUVBorders(float min, float max, float[] bordersPercent)
-        {
+        private float[] GetUVBorders(float min, float max, float[] bordersPercent) {
             return new[]
             {
                 min,
@@ -567,8 +543,7 @@ namespace TwentyFiveSlicer.Runtime
             };
         }
 
-        private float[] GetOriginalSizes(float[] bordersPercent, float totalSize)
-        {
+        private float[] GetOriginalSizes(float[] bordersPercent, float totalSize) {
             return new[]
             {
                 (bordersPercent[1] - bordersPercent[0]) * totalSize,
@@ -582,41 +557,31 @@ namespace TwentyFiveSlicer.Runtime
         /// <summary>
         /// Distributes corner/edge vs. middle areas, setting which parts are fixed or stretched.
         /// </summary>
-        private float[] GetAdjustedSizes(float totalSize, float[] originalSizes, bool[] fixedSizes)
-        {
+        private float[] GetAdjustedSizes(float totalSize, float[] originalSizes, bool[] fixedSizes) {
             float totalFixedSize = 0f;
             float stretchableSizeRatio = 0f;
 
-            for (int i = 0; i < 5; i++)
-            {
-                if (fixedSizes[i]) totalFixedSize += originalSizes[i];
+            for(int i = 0; i < 5; i++) {
+                if(fixedSizes[i]) totalFixedSize += originalSizes[i];
                 else stretchableSizeRatio += originalSizes[i];
             }
 
             float[] adjustedSizes = new float[5];
             float totalStretchableSize = Mathf.Max(0, totalSize - totalFixedSize);
 
-            if (totalSize < totalFixedSize)
-            {
+            if(totalSize < totalFixedSize) {
                 // If total final size < sum of fixed corners/edges, scale them down proportionally
                 float scaleRatio = (totalFixedSize < 0.0001f) ? 0f : (totalSize / totalFixedSize);
-                for (int i = 0; i < 5; i++)
-                {
+                for(int i = 0; i < 5; i++) {
                     adjustedSizes[i] = fixedSizes[i] ? originalSizes[i] * scaleRatio : 0f;
                 }
-            }
-            else
-            {
+            } else {
                 // Otherwise, distribute the leftover to the middle
-                for (int i = 0; i < 5; i++)
-                {
-                    if (fixedSizes[i])
-                    {
+                for(int i = 0; i < 5; i++) {
+                    if(fixedSizes[i]) {
                         adjustedSizes[i] = originalSizes[i];
-                    }
-                    else
-                    {
-                        if (stretchableSizeRatio > 0.0001f)
+                    } else {
+                        if(stretchableSizeRatio > 0.0001f)
                             adjustedSizes[i] = totalStretchableSize * (originalSizes[i] / stretchableSizeRatio);
                         else
                             adjustedSizes[i] = 0f;
@@ -630,13 +595,11 @@ namespace TwentyFiveSlicer.Runtime
         /// <summary>
         /// Calculates the positions of each slice segment from 'start' onward.
         /// </summary>
-        private float[] GetPositions(float start, float[] sizes)
-        {
+        private float[] GetPositions(float start, float[] sizes) {
             float[] positions = new float[6];
             positions[0] = start;
 
-            for (int i = 1; i <= 5; i++)
-            {
+            for(int i = 1; i <= 5; i++) {
                 positions[i] = positions[i - 1] + sizes[i - 1];
             }
 
