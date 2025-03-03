@@ -1,29 +1,22 @@
 using System.Collections.Generic;
-using TwentyFiveSlicer.Runtime;
 using UnityEngine;
 
-namespace Twentyfiveslicer.Runtime.SerializedDictionary
-{
+namespace TwentyFiveSlicer.Runtime.SerializedDictionary {
     [System.Serializable]
-    public class SerializedDictionary<TKey, TValue> : ISerializationCallbackReceiver
-    {
+    public class SerializedDictionary<TKey, TValue> : ISerializationCallbackReceiver {
         [SerializeField] private List<SerializableKeyValuePair<TKey, TValue>> items = new();
         private Dictionary<TKey, TValue> _dictionary = new();
 
-        public void OnBeforeSerialize()
-        {
+        public void OnBeforeSerialize() {
             items.Clear();
-            foreach (var kvp in _dictionary)
-            {
+            foreach(var kvp in _dictionary) {
                 items.Add(new SerializableKeyValuePair<TKey, TValue>(kvp.Key, kvp.Value));
             }
         }
 
-        public void OnAfterDeserialize()
-        {
+        public void OnAfterDeserialize() {
             _dictionary.Clear();
-            foreach (var item in items)
-            {
+            foreach(var item in items) {
                 _dictionary[item.key] = item.value;
             }
         }

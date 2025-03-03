@@ -1,6 +1,6 @@
 {
     "name": "Twentyfiveslicer.Runtime",
-    "rootNamespace": "Twentyfiveslicer.Runtime",
+    "rootNamespace": "TwentyFiveSlicer.Runtime",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

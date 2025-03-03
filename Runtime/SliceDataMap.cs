@@ -1,37 +1,30 @@
-using UnityEngine;
 using System.Collections.Generic;
-using Twentyfiveslicer.Runtime.SerializedDictionary;
+using TwentyFiveSlicer.Runtime.SerializedDictionary;
+using UnityEngine;
 
-namespace TwentyFiveSlicer.Runtime
-{
+namespace TwentyFiveSlicer.Runtime {
     [CreateAssetMenu(fileName = "SliceDataMap", menuName = "TwentyFiveSlicer/SliceDataMap", order = 0)]
-    public class SliceDataMap : ScriptableObject
-    {
+    public class SliceDataMap : ScriptableObject {
         [SerializeField]
         private SerializedDictionary<Sprite, TwentyFiveSliceData> sliceDataMap = new();
 
-        public bool TryGetSliceData(Sprite sprite, out TwentyFiveSliceData data)
-        {
+        public bool TryGetSliceData(Sprite sprite, out TwentyFiveSliceData data) {
             return sliceDataMap.TryGetValue(sprite, out data);
         }
 
-        public void AddSliceData(Sprite sprite, TwentyFiveSliceData data)
-        {
+        public void AddSliceData(Sprite sprite, TwentyFiveSliceData data) {
             sliceDataMap.Add(sprite, data);
         }
 
-        public void RemoveSliceData(Sprite sprite)
-        {
+        public void RemoveSliceData(Sprite sprite) {
             sliceDataMap.Remove(sprite);
         }
 
-        public IEnumerable<Sprite> GetAllSprites()
-        {
+        public IEnumerable<Sprite> GetAllSprites() {
             return sliceDataMap.Keys;
         }
-        
-        public IEnumerable<KeyValuePair<Sprite, TwentyFiveSliceData>> GetAllEntries()
-        {
+
+        public IEnumerable<KeyValuePair<Sprite, TwentyFiveSliceData>> GetAllEntries() {
             return sliceDataMap.GetAllEntries();
         }
     }
