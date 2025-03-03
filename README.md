@@ -28,6 +28,14 @@ This allows for far more detailed slicing. Where traditional 9-slice images ofte
 
 ---
 
+## Added Functionality
+
+<p align="center">
+  <img src="Documentation~/Images/added-features.gif" alt="25-slice Debugging View" width="700" />
+</p>
+
+---
+
 ## Installing the Package
 
 ### Install via Git URL
