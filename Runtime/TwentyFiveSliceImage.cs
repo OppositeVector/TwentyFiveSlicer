@@ -21,13 +21,26 @@ namespace TwentyFiveSlicer.Runtime {
             }
         }
 
-        [SerializeField] private bool debuggingView = false;
+        public Vector2 Ratio {
+            get { return _ratio; }
+            set {
+                _ratio = value;
+                SetVerticesDirty();
+            }
+        }
 
-        private readonly bool[] _fixedColumns = { true, false, true, false, true };
-        private readonly bool[] _fixedRows = { true, false, true, false, true };
+        [SerializeField] private bool debuggingView = false;
+        [SerializeField] private Vector2 _ratio = Vector2.one * 0.5f;
+
+        [SerializeField] [HideInInspector] private Sprite _known;
 
         protected override void OnPopulateMesh(VertexHelper vh) {
-            vh.Clear();
+
+            if(_known != sprite) {
+                _known = sprite;
+                ResetRatio();
+            }
+
             if(sprite == null) {
                 base.OnPopulateMesh(vh);
                 return;
@@ -37,6 +50,8 @@ namespace TwentyFiveSlicer.Runtime {
                 base.OnPopulateMesh(vh);
                 return;
             }
+
+            vh.Clear();
 
             Rect rect = GetPixelAdjustedRect();
             Vector4 outer = UnityEngine.Sprites.DataUtility.GetOuterUV(sprite);
@@ -51,8 +66,8 @@ namespace TwentyFiveSlicer.Runtime {
             float[] originalWidths = GetOriginalSizes(xBordersPercent, spriteRect.width);
             float[] originalHeights = GetOriginalSizes(yBordersPercent, spriteRect.height);
 
-            float[] widths = GetAdjustedSizes(rect.width, originalWidths, _fixedColumns);
-            float[] heights = GetAdjustedSizes(rect.height, originalHeights, _fixedRows);
+            float[] widths = GetAdjustedSizes(rect.width, originalWidths, _ratio.x);
+            float[] heights = GetAdjustedSizes(rect.height, originalHeights, _ratio.y);
 
             float[] xPositions = GetPositions(rect.xMin, widths);
             float[] yPositions = GetPositions(rect.yMin, heights);
@@ -62,71 +77,119 @@ namespace TwentyFiveSlicer.Runtime {
             DrawSlices(vh, slices);
         }
 
+        public void SetTraget(Transform target, TargetAxis axis = TargetAxis.Both) {
+
+            if(!SliceDataManager.Instance.TryGetSliceData(sprite, out var sliceData)) {
+                return;
+            }
+
+            Rect spriteRect = sprite.rect;
+            Rect rect = GetPixelAdjustedRect();
+            var targetInLocal = PixelAdjustPoint(transform.InverseTransformPoint(target.position));
+
+            if((axis & TargetAxis.X) > 0) {
+
+                float[] xBordersPercent = GetXBordersPercent(sliceData);
+                float[] originalWidths = GetOriginalSizes(xBordersPercent, spriteRect.width);
+
+                var variableWidth = rect.width - originalWidths[0] - originalWidths[2] - originalWidths[4];
+
+                var rTrans = transform as RectTransform;
+                var x = (targetInLocal.x + (rect.width * rTrans.pivot.x) - originalWidths[0] - (originalWidths[2] / 2)) / variableWidth;
+
+                _ratio = new Vector2(x, _ratio.y);
+            }
+
+            if((axis & TargetAxis.Y) > 0) {
+
+                float[] yBordersPercent = GetYBordersPercent(sliceData);
+                float[] originalHeights = GetOriginalSizes(yBordersPercent, spriteRect.height);
+
+                var variableHeight = rect.height - originalHeights[0] - originalHeights[2] - originalHeights[4];
+
+                var rTrans = transform as RectTransform;
+                var y = (targetInLocal.y + (rect.height * rTrans.pivot.y) - originalHeights[0] - (originalHeights[2] / 2)) / variableHeight;
+
+                _ratio = new Vector2(_ratio.x, y);
+            }
+
+            SetVerticesDirty();
+        }
+
+        public void ResetRatio() {
+
+            if(!SliceDataManager.Instance.TryGetSliceData(sprite, out var sliceData)) {
+                return;
+            }
+
+            float[] xBordersPercent = GetXBordersPercent(sliceData);
+            float[] yBordersPercent = GetYBordersPercent(sliceData);
+
+            float[] widths = GetOriginalSizes(xBordersPercent, sprite.rect.width);
+            float[] heights = GetOriginalSizes(yBordersPercent, sprite.rect.height);
+
+            _ratio = new Vector2(widths[1] / (widths[1] + widths[3]), heights[1] / (heights[1] + heights[3]));
+        }
+
         private float[] GetXBordersPercent(TwentyFiveSliceData sliceData) {
-            return new float[]
-            {
+            return new float[] {
                 0f, sliceData.xBorders[0], sliceData.xBorders[1], sliceData.xBorders[2],
                 sliceData.xBorders[3], 1
             };
         }
 
         private float[] GetYBordersPercent(TwentyFiveSliceData sliceData) {
-            return new float[]
-            {
+            return new float[] {
                 0f, 1f - sliceData.yBorders[3], 1f - sliceData.yBorders[2],
                 1f - sliceData.yBorders[1], 1f - sliceData.yBorders[0], 1f
             };
         }
 
         private float[] GetUVBorders(float min, float max, float[] bordersPercent) {
-            return new float[]
-            {
+            return new float[] {
                 min, Mathf.Lerp(min, max, bordersPercent[1]), Mathf.Lerp(min, max, bordersPercent[2]),
                 Mathf.Lerp(min, max, bordersPercent[3]), Mathf.Lerp(min, max, bordersPercent[4]), max
             };
         }
 
         private float[] GetOriginalSizes(float[] bordersPercent, float totalSize) {
-            return new float[]
-            {
-                (bordersPercent[1] - bordersPercent[0]) * totalSize * pixelsPerUnitMultiplier,
-                (bordersPercent[2] - bordersPercent[1]) * totalSize * pixelsPerUnitMultiplier,
-                (bordersPercent[3] - bordersPercent[2]) * totalSize * pixelsPerUnitMultiplier,
-                (bordersPercent[4] - bordersPercent[3]) * totalSize * pixelsPerUnitMultiplier,
-                (bordersPercent[5] - bordersPercent[4]) * totalSize * pixelsPerUnitMultiplier
+            return new float[] {
+                (bordersPercent[1] - bordersPercent[0]) * totalSize / pixelsPerUnitMultiplier,
+                (bordersPercent[2] - bordersPercent[1]) * totalSize / pixelsPerUnitMultiplier,
+                (bordersPercent[3] - bordersPercent[2]) * totalSize / pixelsPerUnitMultiplier,
+                (bordersPercent[4] - bordersPercent[3]) * totalSize / pixelsPerUnitMultiplier,
+                (bordersPercent[5] - bordersPercent[4]) * totalSize / pixelsPerUnitMultiplier
             };
         }
 
-        private float[] GetAdjustedSizes(float totalSize, float[] originalSizes, bool[] fixedSizes) {
-            float totalFixedSize = 0f;
-            float stretchableSizeRatio = 0f;
+        private float[] GetAdjustedSizes(float totalSize, float[] originalSizes, float ratio) {
 
-            // Calculate total fixed size and stretchable size ratio
-            for(int i = 0; i < 5; i++) {
-                if(fixedSizes[i]) {
-                    totalFixedSize += originalSizes[i];
-                } else {
-                    stretchableSizeRatio += originalSizes[i];
-                }
-            }
+            float totalFixedSize = originalSizes[0] + originalSizes[2] + originalSizes[4];
 
             float totalStretchableSize = Mathf.Max(0, totalSize - totalFixedSize);
-            float[] adjustedSizes = new float[5];
+            float[] adjustedSizes; // = new float[5];
 
             // If total size is less than total fixed size, scale down the fixed sizes
             if(totalSize < totalFixedSize) {
                 float scaleRatio = totalSize / totalFixedSize;
-                for(int i = 0; i < 5; i++) {
-                    adjustedSizes[i] = fixedSizes[i] ? originalSizes[i] * scaleRatio : 0;
-                }
+                adjustedSizes = new[] {
+                    originalSizes[0] * scaleRatio,
+                    0,
+                    originalSizes[2] * scaleRatio,
+                    0,
+                    originalSizes[4] * scaleRatio
+                };
             }
             // Otherwise, distribute the remaining size proportionally to the stretchable sizes
             else {
-                for(int i = 0; i < 5; i++) {
-                    adjustedSizes[i] = fixedSizes[i]
-                        ? originalSizes[i]
-                        : totalStretchableSize * (originalSizes[i] / stretchableSizeRatio);
-                }
+                ratio = Mathf.Clamp01(ratio);
+                adjustedSizes = new[] {
+                    originalSizes[0],
+                    totalStretchableSize * ratio,
+                    originalSizes[2],
+                    totalStretchableSize * (1 - ratio),
+                    originalSizes[4]
+                };
             }
 
             return adjustedSizes;
@@ -180,6 +243,13 @@ namespace TwentyFiveSlicer.Runtime {
             vh.AddVert(new Vector3(topRight.x, bottomLeft.y), color, new Vector2(uvTopRight.x, uvBottomLeft.y));
             vh.AddTriangle(vertexIndex, vertexIndex + 1, vertexIndex + 2);
             vh.AddTriangle(vertexIndex, vertexIndex + 2, vertexIndex + 3);
+        }
+
+        public enum TargetAxis {
+            None = 0,
+            X = 1,
+            Y = 2,
+            Both = 3
         }
     }
 }

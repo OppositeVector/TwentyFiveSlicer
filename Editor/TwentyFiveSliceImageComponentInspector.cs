@@ -10,6 +10,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor {
         private SerializedProperty _spSprite;
         private SerializedProperty _pixesPreUnitMultiplierProp;
         private SerializedProperty _spDebuggingView;
+        private SerializedProperty _ratioProp;
 
         private bool _shouldShowDebuggingMenus = false;
 
@@ -22,15 +23,22 @@ namespace TwentyFiveSlicer.TFSEditor.Editor {
             _spSprite = serializedObject.FindProperty("m_Sprite");
             _pixesPreUnitMultiplierProp = serializedObject.FindProperty("m_PixelsPerUnitMultiplier");
             _spDebuggingView = serializedObject.FindProperty("debuggingView");
+            _ratioProp = serializedObject.FindProperty("_ratio");
         }
         public override void OnInspectorGUI() {
-            base.serializedObject.Update();
+            serializedObject.Update();
+            EditorGUI.BeginChangeCheck();
             SpriteGUI();
             AppearanceControlsGUI();
+            EditorGUILayout.PropertyField(_ratioProp);
             RaycastControlsGUI();
             MaskableControlsGUI();
-            NativeSizeButtonGUI();
+            
             EditorGUILayout.PropertyField(_pixesPreUnitMultiplierProp);
+
+            NativeSizeButtonGUI();
+
+            EditorGUILayout.Space();
 
             _shouldShowDebuggingMenus = EditorGUILayout.Foldout(_shouldShowDebuggingMenus, "Debugging");
             if(_shouldShowDebuggingMenus) {
@@ -41,7 +49,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor {
 
             ShowSliceDataWarning();
 
-            base.serializedObject.ApplyModifiedProperties();
+            serializedObject.ApplyModifiedProperties();
         }
         private void ShowSliceDataWarning() {
             // If there's a sprite but no 25-slice data, show the warning
