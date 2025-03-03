@@ -18,6 +18,8 @@ namespace TwentyFiveSlicer.TFSEditor.Editor {
 
         // Scroll and zoom states
         private Vector2 _scrollPosition;
+        private Vector2 _startDragMousePos;
+        private Vector2 _startDragScrollPosition;
         private float _baseZoom = 1f;
         private float _zoomFactor = 1f;
         private bool _autoZoomApplied = false;
@@ -73,7 +75,26 @@ namespace TwentyFiveSlicer.TFSEditor.Editor {
 
             DrawSpriteAndCanvas();
 
+            DragCanvas();
+
             Repaint();
+        }
+
+        private void DragCanvas() {
+
+            if(_dragInfo.IsDragging()) {
+                return;
+            }
+
+            Event currentEvent = Event.current;
+            Vector2 mousePos = currentEvent.mousePosition;
+
+            if(currentEvent.type == EventType.MouseDown) {
+                _startDragScrollPosition = _scrollPosition;
+                _startDragMousePos = mousePos;
+            } else if(currentEvent.type == EventType.MouseDrag) {
+                _scrollPosition = _startDragScrollPosition + (_startDragMousePos - mousePos);
+            }
         }
 
         /// <summary>
@@ -144,7 +165,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor {
             Event currentEvent = Event.current;
             if(currentEvent.type == EventType.ScrollWheel) {
                 float zoomDelta = -currentEvent.delta.y * 0.05f;
-                _zoomFactor = Mathf.Clamp(_zoomFactor + zoomDelta, 0.5f, 2.0f);
+                _zoomFactor = Mathf.Clamp(_zoomFactor + zoomDelta, 0.5f, 10.0f);
                 currentEvent.Use();
             }
         }
