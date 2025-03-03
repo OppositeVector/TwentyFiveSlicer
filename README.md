@@ -1,9 +1,7 @@
 
-# Twenty Five Slicer
+# Twenty Five Slicer Forked
 
-[![openupm](https://img.shields.io/npm/v/com.kwanjoong.twentyfiveslicer?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.kwanjoong.twentyfiveslicer/)
-
-**Twenty Five Slicer** is a Unity package designed for more advanced sprite slicing, enabling a "25-slice" approach. It divides a sprite into a 5x5 grid, allowing precise scaling and manipulation of individual regions while preserving key areas.
+**Twenty Five Slicer** forked from the [original](https://github.com/kwan3854/TwentyFiveSlicer), and added some functionality of my own.
 
 ---
 
@@ -32,56 +30,13 @@ This allows for far more detailed slicing. Where traditional 9-slice images ofte
 
 ## Installing the Package
 
-### 1. Install via OpenUPM
-
-#### 1.1. Install via Package Manager
-Please follow the instructions:
-1. Open **Edit → Project Settings → Package Manager**
-2. Add a new Scoped Registry (or edit the existing OpenUPM entry)
-  - **Name**: `package.openupm.com`
-  - **URL**: `https://package.openupm.com`
-3. Click **Save** or **Apply**
-4. Open **Window → Package Manager**
-5. Click the `+` button
-6. Select **Add package by name...** (or **Add package from git URL...**)
-7. Paste `com.kwanjoong.twentyfiveslicer` into **Name**
-8. Paste a version (e.g., `1.1.2`) into **Version**
-9. Click **Add**
-
----
-
-#### 1.2. Alternatively, merge the snippet into `Packages/manifest.json`
-```json
-{
-  "scopedRegistries": [
-    {
-      "name": "package.openupm.com",
-      "url": "https://package.openupm.com",
-      "scopes": []
-    }
-  ],
-  "dependencies": {
-    "com.kwanjoong.twentyfiveslicer": "1.1.2"
-  }
-}
-```
-
----
-
-#### 1.3. Install via command-line interface
-```sh
-openupm add com.kwanjoong.twentyfiveslicer
-```
-
----
-
-### 2. Install via Git URL
+### Install via Git URL
 
 1. Open the Unity **Package Manager**.
 2. Select **Add package from Git URL**.
-3. Enter: `https://github.com/kwan3854/twentyfiveslicer.git`
+3. Enter: `https://github.com/OppositeVector/TwentyFiveSlicer.git`
 4. To install a specific version, append a version tag, for example:  
-   `https://github.com/kwan3854/twentyfiveslicer.git#v1.0.0`
+   `https://github.com/OppositeVector/TwentyFiveSlicer.git#v1.0.0`
 
 ---
 
