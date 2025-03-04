@@ -79,7 +79,7 @@ This allows for far more detailed slicing. Where traditional 9-slice images ofte
   - Borders are displayed visually for accurate adjustments.
 
    <p align="center">
-     <img src="Documentation~/Images/editor.png" alt="25-Slice Editor" width="700" />
+     <img src="Documentation~/Images/editor-updated.png" alt="25-Slice Editor" width="700" />
    </p>
 
 4. **Save the Configuration**
