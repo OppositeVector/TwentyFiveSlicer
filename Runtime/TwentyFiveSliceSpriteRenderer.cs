@@ -237,13 +237,13 @@ namespace TwentyFiveSlicer.Runtime {
         // Public Methods
         //========================================================
 
-        public void SetTarget(Transform target, TargetAxis axis = TargetAxis.Both) {
+        public void SetTarget(Vector3 targetInWorldSpace, TargetAxis axis = TargetAxis.Both) {
             if(!SliceDataManager.Instance.TryGetSliceData(sprite, out var sliceData)) {
                 return;
             }
 
             Rect spriteRect = sprite.rect;
-            var targetInLocal = transform.InverseTransformPoint(target.position);
+            var targetInLocal = transform.InverseTransformPoint(targetInWorldSpace);
 
             float realPpu = (pixelsPerUnit > 0f) ? pixelsPerUnit : sprite.pixelsPerUnit;
             if(realPpu <= 0f) realPpu = 100f;

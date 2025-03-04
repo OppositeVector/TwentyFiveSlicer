@@ -77,7 +77,7 @@ namespace TwentyFiveSlicer.Runtime {
             DrawSlices(vh, slices);
         }
 
-        public void SetTraget(Transform target, TargetAxis axis = TargetAxis.Both) {
+        public void SetTraget(Vector3 targetInWorldSpace, TargetAxis axis = TargetAxis.Both) {
 
             if(!SliceDataManager.Instance.TryGetSliceData(sprite, out var sliceData)) {
                 return;
@@ -85,7 +85,7 @@ namespace TwentyFiveSlicer.Runtime {
 
             Rect spriteRect = sprite.rect;
             Rect rect = GetPixelAdjustedRect();
-            var targetInLocal = PixelAdjustPoint(transform.InverseTransformPoint(target.position));
+            var targetInLocal = PixelAdjustPoint(transform.InverseTransformPoint(targetInWorldSpace));
 
             if((axis & TargetAxis.X) > 0) {
 
