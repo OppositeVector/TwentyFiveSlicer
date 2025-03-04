@@ -26,6 +26,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
         private SerializedProperty _spSize;
         private SerializedProperty _spSortingLayerName;
         private SerializedProperty _spSortingOrder;
+        private SerializedProperty _ratioProp;
         
         // HelpBox message
         private const string NoSliceDataWarning = 
@@ -45,6 +46,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
             _spSize             = serializedObject.FindProperty("size");
             _spSortingLayerName = serializedObject.FindProperty("sortingLayerName");
             _spSortingOrder     = serializedObject.FindProperty("sortingOrder");
+            _ratioProp          = serializedObject.FindProperty("_ratio");
         }
 
         public override void OnInspectorGUI()
@@ -64,6 +66,8 @@ namespace TwentyFiveSlicer.TFSEditor.Editor
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.PropertyField(_spSize, new GUIContent("Size"));
+
+            EditorGUILayout.PropertyField(_ratioProp, new GUIContent("Ratio"));
 
             // Pivot & Size
             EditorGUILayout.PropertyField(_spUseSpritePivot, new GUIContent("Use Sprite Pivot"));
