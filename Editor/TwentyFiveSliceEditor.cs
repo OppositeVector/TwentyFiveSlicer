@@ -52,6 +52,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor {
         }
 
         private void OnEnable() {
+            saveChangesMessage = "Boarder changed but were not saved yet";
             this.wantsMouseMove = true;
         }
 
@@ -78,6 +79,11 @@ namespace TwentyFiveSlicer.TFSEditor.Editor {
             DragCanvas();
 
             Repaint();
+        }
+
+        public override void SaveChanges() {
+            SaveBorders();
+            base.SaveChanges();
         }
 
         private void DragCanvas() {
@@ -519,12 +525,14 @@ namespace TwentyFiveSlicer.TFSEditor.Editor {
             var normalizedValue = (x - spriteRect.x) / spriteRect.width;
             var pixelBound = Mathf.Round(normalizedValue * CurrentSprite.rect.width);
             _xBorders[vIndex] = (pixelBound / CurrentSprite.rect.width);
+            hasUnsavedChanges = true;
         }
 
         private void MoveY(float y, Rect spriteRect, int hIndex) {
             var normalizedValue = (y - spriteRect.y) / spriteRect.height;
             var pixelBound = Mathf.Round(normalizedValue * CurrentSprite.rect.height);
             _yBorders[hIndex] = (pixelBound / CurrentSprite.rect.height);
+            hasUnsavedChanges = true;
         }
 
         private float ClampXPosition(Rect spriteRect, float mouseX, int index) {
@@ -586,19 +594,27 @@ namespace TwentyFiveSlicer.TFSEditor.Editor {
             GUILayout.Space(20);
             GUILayout.BeginVertical();
 
+            void UpdateIfNeeded(float[] borders, int i, float size, float value, float orig) {
+
+                // Clamp
+                float min = (i > 0) ? borders[i - 1] * size : 0f;
+                float max = (i < 3) ? borders[i + 1] * size : size;
+                value = Mathf.Clamp(value, min, max);
+
+                if(value != orig) {
+                    hasUnsavedChanges = true;
+                    borders[i] = Mathf.InverseLerp(0, size, value); ;
+                }
+            }
+
             // ========== Vertical Borders ==========
             GUILayout.Label("X Borders", boldCenterLabel);
 
             for(int i = 0; i < 4; i++) {
 
-                float newValue = EditorGUILayout.IntField($"X{i + 1}", Mathf.RoundToInt(_xBorders[i] * CurrentSprite.rect.width));
-
-                // Clamp
-                float min = (i > 0) ? _xBorders[i - 1] * CurrentSprite.rect.width : 0f;
-                float max = (i < 3) ? _xBorders[i + 1] * CurrentSprite.rect.width : CurrentSprite.rect.width;
-                newValue = Mathf.Clamp(newValue, min, max);
-
-                _xBorders[i] = Mathf.InverseLerp(0, CurrentSprite.rect.width, newValue);
+                int current = Mathf.RoundToInt(_xBorders[i] * CurrentSprite.rect.width);
+                float newValue = EditorGUILayout.IntField($"X{i + 1}", current);
+                UpdateIfNeeded(_xBorders, i, CurrentSprite.rect.width, newValue, current);
             }
 
             GUILayout.EndVertical();
@@ -611,13 +627,9 @@ namespace TwentyFiveSlicer.TFSEditor.Editor {
 
             for(int i = 0; i < 4; i++) {
 
-                float newValue = EditorGUILayout.IntField($"Y{i + 1}", Mathf.RoundToInt(_yBorders[i] * CurrentSprite.rect.height));
-
-                float min = (i > 0) ? (_yBorders[i - 1] * CurrentSprite.rect.height) : 0f;
-                float max = (i < 3) ? (_yBorders[i + 1] * CurrentSprite.rect.height) : CurrentSprite.rect.height;
-                newValue = Mathf.Clamp(newValue, min, max);
-
-                _yBorders[i] = Mathf.InverseLerp(0, CurrentSprite.rect.height, newValue);
+                int current = Mathf.RoundToInt(_yBorders[i] * CurrentSprite.rect.height);
+                float newValue = EditorGUILayout.IntField($"Y{i + 1}", current);
+                UpdateIfNeeded(_yBorders, i, CurrentSprite.rect.height, newValue, current);
             }
 
             GUILayout.EndVertical();
@@ -658,6 +670,7 @@ namespace TwentyFiveSlicer.TFSEditor.Editor {
                 yBorders = _yBorders
             };
             SliceDataManager.Instance.SaveSliceData(CurrentSprite, sliceData);
+            hasUnsavedChanges = false;
         }
     }
 }

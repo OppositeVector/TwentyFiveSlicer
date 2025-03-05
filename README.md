@@ -87,7 +87,7 @@ This is the **UI** approach, similar to `UnityEngine.UI.Image`:
   <img src="Documentation~/Images/how_to_add_25slice_gameobject.png" alt="How to Add 25-Slice GameObject" width="700" />
 </p>
 <p align="center">
-  <img src="Documentation~/Images/image_component.png" alt="How to Add 25-Slice GameObject" width="700" />
+  <img src="Documentation~/Images/image_component_updated.png" alt="How to Add 25-Slice GameObject" width="700" />
 </p>
 
 #### 2. Using with **2D Scenes (TwentyFiveSliceSpriteRenderer)**
@@ -104,7 +104,7 @@ This is the **MeshRenderer**-based approach, similar to `SpriteRenderer`:
   <img src="Documentation~/Images/sprite_renderer_menu.png" alt="How to Add 25-Slice GameObject" width="700" />
 </p>
 <p align="center">
-  <img src="Documentation~/Images/sprite_renderer_component.png" alt="How to Add 25-Slice GameObject" width="700" />
+  <img src="Documentation~/Images/sprite_renderer_component_updated.png" alt="How to Add 25-Slice GameObject" width="700" />
 </p>
 
 ---

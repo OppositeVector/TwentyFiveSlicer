@@ -76,6 +76,8 @@ namespace TwentyFiveSlicer.Runtime {
         private MeshFilter _meshFilter;
         private Mesh _generatedMesh;
 
+        private Sprite _known;
+
         private bool _needMeshUpdate = true; // If true, triggers a mesh rebuild in RebuildMeshIfNeeded()
 
         //========================================================
@@ -284,6 +286,21 @@ namespace TwentyFiveSlicer.Runtime {
         // Private Methods
         //========================================================
 
+        public void ResetRatio() {
+
+            if(!SliceDataManager.Instance.TryGetSliceData(sprite, out var sliceData)) {
+                return;
+            }
+
+            float[] xBordersPercent = GetXBordersPercent(sliceData);
+            float[] yBordersPercent = GetYBordersPercent(sliceData);
+
+            float[] widths = GetOriginalSizes(xBordersPercent, sprite.rect.width);
+            float[] heights = GetOriginalSizes(yBordersPercent, sprite.rect.height);
+
+            _ratio = new Vector2(widths[1] / (widths[1] + widths[3]), heights[1] / (heights[1] + heights[3]));
+        }
+
         /// <summary>
         /// Updates basic settings related to MeshRenderer, such as sorting and material color.
         /// </summary>
@@ -309,6 +326,11 @@ namespace TwentyFiveSlicer.Runtime {
         /// Rebuild the mesh if the flag is set.
         /// </summary>
         private void RebuildMeshIfNeeded() {
+            if(_known != sprite) {
+                _known = sprite;
+                ResetRatio();
+            }
+
             if(!_needMeshUpdate) return;
             _needMeshUpdate = false;
 
