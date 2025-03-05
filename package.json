@@ -16,9 +16,10 @@
     "graphics"
   ],
   "author": {
-    "name": "Victor Belski",
+    "name": "Polymorph",
     "url": "https://github.com/OppositeVector/TwentyFiveSlicer"
   },
+  "documentationUrl": "https://github.com/OppositeVector/TwentyFiveSlicer",
   "repository": {
     "type": "git",
     "url": "https://github.com/OppositeVector/TwentyFiveSlicer.git"
