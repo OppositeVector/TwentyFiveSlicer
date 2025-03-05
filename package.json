@@ -1,6 +1,6 @@
 {
-  "name": "com.kwanjoong.twentyfiveslicer",
-  "version": "1.3.0",
+  "name": "polymorph.twentyfiveslicer",
+  "version": "1.3.2",
   "displayName": "Twenty Five Slicer",
   "description": "A Unity package that slices a sprite into 25 slices instead of the usual 9, allowing for more flexible UI designs.",
   "unity": "2022.3",
@@ -16,8 +16,8 @@
     "graphics"
   ],
   "author": {
-    "name": "Kwanjoong Lee",
-    "url": "https://github.com/kwan3854/TwentyFiveSlicer"
+    "name": "Victor Belski",
+    "url": "https://github.com/OppositeVector/TwentyFiveSlicer"
   },
   "repository": {
     "type": "git",
