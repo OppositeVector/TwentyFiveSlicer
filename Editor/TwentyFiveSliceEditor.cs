@@ -322,18 +322,18 @@ namespace TwentyFiveSlicer.TFSEditor.Editor {
             Handles.BeginGUI();
             Handles.color = Color.green;
 
-            // Vertical lines
+            // X lines
             for(int i = 0; i < 4; i++) {
                 float x = spriteRect.x + (spriteRect.width * _xBorders[i]);
                 Handles.DrawLine(new Vector3(x, spriteRect.y), new Vector3(x, spriteRect.y + spriteRect.height));
-                Handles.Label(new Vector3(x - 5, spriteRect.y - 20), $"X{i + 1}");
+                Handles.Label(new Vector3(x - 5, spriteRect.y - 20), $"{(i < 2 ? "L" + (i + 1) : "R" + (4 - i))}");
             }
 
-            // Horizontal lines
+            // Y lines
             for(int i = 0; i < 4; i++) {
                 float y = spriteRect.y + (spriteRect.height * _yBorders[i]);
                 Handles.DrawLine(new Vector3(spriteRect.x, y), new Vector3(spriteRect.x + spriteRect.width, y));
-                Handles.Label(new Vector3(spriteRect.x + spriteRect.width + 5, y), $"Y{i + 1}");
+                Handles.Label(new Vector3(spriteRect.x + spriteRect.width + 5, y), $"{(i < 2 ? "T" + (i + 1) : "B" + (4 - i))}");
             }
 
             Handles.EndGUI();
@@ -610,12 +610,31 @@ namespace TwentyFiveSlicer.TFSEditor.Editor {
             // ========== Vertical Borders ==========
             GUILayout.Label("X Borders", boldCenterLabel);
 
-            for(int i = 0; i < 4; i++) {
+            int current = Mathf.RoundToInt(_xBorders[0] * CurrentSprite.rect.width);
+            float newVal =EditorGUILayout.IntField("L1", current);
+            UpdateIfNeeded(_xBorders, 0, CurrentSprite.rect.width, newVal, current);
 
-                int current = Mathf.RoundToInt(_xBorders[i] * CurrentSprite.rect.width);
-                float newValue = EditorGUILayout.IntField($"X{i + 1}", current);
-                UpdateIfNeeded(_xBorders, i, CurrentSprite.rect.width, newValue, current);
-            }
+            current = Mathf.RoundToInt(_xBorders[1] * CurrentSprite.rect.width);
+            newVal =EditorGUILayout.IntField("L2", current);
+            UpdateIfNeeded(_xBorders, 1, CurrentSprite.rect.width, newVal, current);
+
+            current = Mathf.RoundToInt((1 - _xBorders[2]) * CurrentSprite.rect.width);
+            newVal = EditorGUILayout.IntField("R2", current);
+            UpdateIfNeeded(_xBorders, 2, CurrentSprite.rect.width, CurrentSprite.rect.width - newVal, current);
+
+            current = Mathf.RoundToInt((1 - _xBorders[3]) * CurrentSprite.rect.width);
+            newVal = EditorGUILayout.IntField("R1", current);
+            UpdateIfNeeded(_xBorders, 3, CurrentSprite.rect.width, CurrentSprite.rect.width - newVal, current);
+
+            // for(int i = 0; i < 4; i++) {
+
+            //     var label = i < 2 ? "L" : "R";
+            //     label += i < 2 ? i + 1 : 4 - i;
+            //     int current = Mathf.RoundToInt(_xBorders[i] * CurrentSprite.rect.width);
+            //     current = i 
+            //     float newValue = EditorGUILayout.IntField(label, current);
+            //     UpdateIfNeeded(_xBorders, i, CurrentSprite.rect.width, newValue, current);
+            // }
 
             GUILayout.EndVertical();
 
@@ -625,12 +644,28 @@ namespace TwentyFiveSlicer.TFSEditor.Editor {
             GUILayout.BeginVertical();
             GUILayout.Label("Y Borders", boldCenterLabel);
 
-            for(int i = 0; i < 4; i++) {
+            current = Mathf.RoundToInt(_yBorders[0] * CurrentSprite.rect.height);
+            newVal =EditorGUILayout.IntField("T1", current);
+            UpdateIfNeeded(_yBorders, 0, CurrentSprite.rect.height, newVal, current);
 
-                int current = Mathf.RoundToInt(_yBorders[i] * CurrentSprite.rect.height);
-                float newValue = EditorGUILayout.IntField($"Y{i + 1}", current);
-                UpdateIfNeeded(_yBorders, i, CurrentSprite.rect.height, newValue, current);
-            }
+            current = Mathf.RoundToInt(_yBorders[1] * CurrentSprite.rect.height);
+            newVal = EditorGUILayout.IntField("T2", current);
+            UpdateIfNeeded(_yBorders, 1, CurrentSprite.rect.height, newVal, current);
+
+            current = Mathf.RoundToInt((1 - _yBorders[2]) * CurrentSprite.rect.height);
+            newVal = EditorGUILayout.IntField("B2", current);
+            UpdateIfNeeded(_yBorders, 2, CurrentSprite.rect.height, CurrentSprite.rect.height - newVal, current);
+
+            current = Mathf.RoundToInt((1 - _yBorders[3]) * CurrentSprite.rect.height);
+            newVal = EditorGUILayout.IntField("B1", current);
+            UpdateIfNeeded(_yBorders, 3, CurrentSprite.rect.height, CurrentSprite.rect.height - newVal, current);
+
+            // for(int i = 0; i < 4; i++) {
+
+            //     current = Mathf.RoundToInt(_yBorders[i] * CurrentSprite.rect.height);
+            //     float newValue = EditorGUILayout.IntField($"Y{i + 1}", current);
+            //     UpdateIfNeeded(_yBorders, i, CurrentSprite.rect.height, newValue, current);
+            // }
 
             GUILayout.EndVertical();
 
