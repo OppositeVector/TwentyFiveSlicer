@@ -49,19 +49,6 @@ This allows for far more detailed slicing. Where traditional 9-slice images ofte
 ---
 
 ## How to Use
-
-### Create Slice Data Map (First-time Setup)
-
-1. Navigate to the `Assets/Resources` folder. (Create it if it doesn’t exist.)
-2. Right-click → **Create → TwentyFiveSlicer → SliceDataMap**
-
-<p align="center">
-  <img src="Documentation~/Images/how_to_add_25slice_datamap.png" alt="How to Add 25-slice DataMap" width="550" style="display:inline-block; margin-right:20px;" />
-  <img src="Documentation~/Images/sliceDataMap.png" alt="SliceDataMap Example" width="200" style="display:inline-block;" />
-</p>
-
----
-
 ### Editing a Sprite
 
 1. **Open the 25-Slice Editor**

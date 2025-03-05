@@ -28,8 +28,9 @@ namespace TwentyFiveSlicer.Runtime {
         private void Initialize() {
             // SliceDataMap ScriptableObject 로드
             _sliceDataMap = Resources.Load<SliceDataMap>("SliceDataMap");
-            if(_sliceDataMap == null) {
 #if UNITY_EDITOR
+            if(_sliceDataMap == null) {
+
                 var resourcesFolder = Path.Combine(Application.dataPath, "Resources");
                 if(!Directory.Exists(resourcesFolder)) {
                     Directory.CreateDirectory(resourcesFolder);
@@ -39,8 +40,8 @@ namespace TwentyFiveSlicer.Runtime {
                 UnityEditor.AssetDatabase.CreateAsset(_sliceDataMap, path);
                 UnityEditor.AssetDatabase.SaveAssets();
                 UnityEditor.AssetDatabase.Refresh();
-#endif
             }
+#endif
         }
 
         public bool TryGetSliceData(Sprite sprite, out TwentyFiveSliceData data) {

@@ -3,7 +3,6 @@ using TwentyFiveSlicer.Runtime.SerializedDictionary;
 using UnityEngine;
 
 namespace TwentyFiveSlicer.Runtime {
-    [CreateAssetMenu(fileName = "SliceDataMap", menuName = "TwentyFiveSlicer/SliceDataMap", order = 0)]
     public class SliceDataMap : ScriptableObject {
         [SerializeField]
         private SerializedDictionary<Sprite, TwentyFiveSliceData> sliceDataMap = new();
