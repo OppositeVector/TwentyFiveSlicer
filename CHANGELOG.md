@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.3.4] - 2025-03-05
+### Changes
+- Changed the way the slice editor works to be more in line with unity's, changed presented border values to be Left, Right, Top, Bottom, their value representing the distance from the edge of the sprite.
+
 ## [1.3.3] - 2025-03-05
 ### Changes
 - Added save changes to the editor window, so that changes are not automatically lost when exiting the boarder editor.
