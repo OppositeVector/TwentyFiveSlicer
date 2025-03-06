@@ -33,6 +33,12 @@ This allows for far more detailed slicing. Where traditional 9-slice images ofte
 <p align="center">
   <img src="Documentation~/Images/added-features.gif" alt="25-slice Debugging View" width="700" />
 </p>
+<p align="center">
+  <img src="Documentation~/Images/margins_example.gif" alt="25-slice Debugging View" width="700" />
+</p>
+<p align="center">
+  <img src="Documentation~/Images/direction_example.gif" alt="25-slice Debugging View" width="700" />
+</p>
 
 ---
 

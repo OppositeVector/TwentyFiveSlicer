@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.4.0] - 2025-03-06
+### Changes
+- Added Margin to the ImageRenderer.
+- Added Diretion tot he ImageRenderer.
+
 ## [1.3.4] - 2025-03-05
 ### Changes
 - Changed the way the slice editor works to be more in line with unity's, changed presented border values to be Left, Right, Top, Bottom, their value representing the distance from the edge of the sprite.
