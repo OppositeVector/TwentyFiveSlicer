@@ -38,6 +38,11 @@ namespace TwentyFiveSlicer.Runtime {
             set { _direction = value; }
         }
 
+        public Margin Margin {
+            get { return _margin; }
+            set { _margin = value; }
+        }
+
         [SerializeField] private bool debuggingView = false;
         [SerializeField] private Vector2 _ratio = Vector2.one * 0.5f;
         [SerializeField] private Margin _margin;
@@ -390,15 +395,6 @@ namespace TwentyFiveSlicer.Runtime {
             vh.AddVert(new Vector3(topRight.x, bottomLeft.y), color, new Vector2(uvTopRight.x, uvTopRight.y)); // 3
             vh.AddTriangle(vertexIndex, vertexIndex + 1, vertexIndex + 2);
             vh.AddTriangle(vertexIndex, vertexIndex + 2, vertexIndex + 3);
-        }
-
-
-        [System.Serializable]
-        public struct Margin {
-            public float Top;
-            public float Bottom;
-            public float Right;
-            public float Left;
         }
     }
 }
