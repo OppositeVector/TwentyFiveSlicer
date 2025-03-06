@@ -45,6 +45,16 @@ namespace TwentyFiveSlicer.Runtime {
 
         [SerializeField][HideInInspector] private Sprite _known;
 
+        public Rect GetRealRect() {
+            var rect = rectTransform.rect;
+            var margin = TrueMargin();
+            rect.yMax += margin.Top;
+            rect.yMin -= margin.Bottom;
+            rect.xMax += margin.Right;
+            rect.xMin -= margin.Left;
+            return rect;
+        }
+
         protected override void OnPopulateMesh(VertexHelper vh) {
 
             if(_known != sprite) {

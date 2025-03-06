@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.4.1] - 2025-03-06
+### Changes
+- Added GetRealRect function to the ImageRenderer which calculates the rect of the image including the margins relative to its direction
+
 ## [1.4.0] - 2025-03-06
 ### Changes
 - Added Margin to the ImageRenderer.
