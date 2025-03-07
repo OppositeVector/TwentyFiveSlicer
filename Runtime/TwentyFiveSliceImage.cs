@@ -39,7 +39,7 @@ namespace TwentyFiveSlicer.Runtime {
         }
 
         public Margin Margin {
-            get { return _margin; }
+            get { return TrueMargin(); }
             set { _margin = value; }
         }
 

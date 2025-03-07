@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.4.3] -2025-03-07
+### Changes
+- Changed the return of Margin to be TrueMargin which take in to account the direction. 
+
 ## [1.4.2] - 2025-03-06
 ### Changes
 - Margin is now a public property on ImageRenderer
