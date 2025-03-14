@@ -7,6 +7,11 @@ namespace TwentyFiveSlicer.Runtime.SerializedDictionary {
         [SerializeField] private List<SerializableKeyValuePair<TKey, TValue>> items = new();
         private Dictionary<TKey, TValue> _dictionary = new();
 
+        public TValue this[TKey key] {
+            get { return _dictionary[key]; }
+            set { _dictionary[key] = value; }
+        }
+
         public void OnBeforeSerialize() {
             items.Clear();
             foreach(var kvp in _dictionary) {

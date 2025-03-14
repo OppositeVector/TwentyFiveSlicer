@@ -27,6 +27,7 @@ namespace TwentyFiveSlicer.Runtime {
 
         private void Initialize() {
             // SliceDataMap ScriptableObject 로드
+
             _sliceDataMap = Resources.Load<SliceDataMap>("SliceDataMap");
 #if UNITY_EDITOR
             if(_sliceDataMap == null) {
