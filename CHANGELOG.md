@@ -1,6 +1,11 @@
 # Changelog
 
-## [1.4.3] -2025-03-07
+## [1.4.4] - 2025-03-14
+### Changes
+- Addressbles dont work with 25-slice, as the reference inside the bundle does not match the reference in the resources.
+- Created a hack solution using the sprite's name to solve this issue, but this will not work when there are several splites sharing the same name.
+
+## [1.4.3] - 2025-03-07
 ### Changes
 - Changed the return of Margin to be TrueMargin which take in to account the direction. 
 
